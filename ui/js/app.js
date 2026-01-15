@@ -235,54 +235,64 @@ function renderButtons(profile) {
   let isDragging = false; // Local state for drag operation
 
   buttons.forEach((b, index) => {
-    // 1. The Wrapper (corresponds to .wrap)
+    // 1. Structure Compatible avec le CSS Hyper-Réaliste
     const wrap = document.createElement("div");
-    wrap.className = "key-wrap"; // We'll use .key-wrap instead of .wrap to match existing logic
-    wrap.dataset.index = index; // IMPORTANT : Toujours définir l'index pour le touch drag
+    wrap.className = "wrap"; // Changer vers .wrap pour compatibilité CSS
+    wrap.dataset.index = index;
 
-    // 2. The Button (corresponds to .button)
+    // Hidden Input pour les états CSS (:checked, :hover, etc.)
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.style.position = "absolute";
+    input.style.opacity = "0";
+    wrap.appendChild(input);
+
+    // 2. Button avec la structure exacte du CSS
     const btn = document.createElement("div");
-    btn.className = "key"; 
+    btn.className = "button";
     btn.dataset.accent = b.accent || "cyan";
 
-    // 3. The Corner (Decorative)
+    // 3. Corner Effects
     const corner = document.createElement("div");
     corner.className = "corner";
     btn.appendChild(corner);
 
-    // 4. The Inner Content (Icon/Label)
+    // 4. Inner Content avec SVG Support
     const inner = document.createElement("div");
     inner.className = "inner";
     
-    // Icon Logic - Support des icônes personnalisées
+    // Créer le contenu avec SVG ou FontAwesome
     const iconClass = b.icon || getIcon(b.label || "");
     let innerContent = "";
+    
+    // Si image custom
     if (b.image) {
        innerContent += `<div class="key-bg" style="background-image: url('${b.image}')"></div>`;
     }
-    // Support des icônes FontAwesome personnalisées
-    innerContent += `<i class="key-icon fa-solid ${iconClass}"></i>`;
+    
+    // Icône FontAwesome directe (plus simple que SVG)
+    innerContent += `<i class="fa-solid ${iconClass}"></i>`;
+    
     if (b.label) {
       innerContent += `<div class="key-label">${escapeHtml(b.label)}</div>`;
     }
     
     inner.innerHTML = innerContent;
     btn.appendChild(inner);
-    
     wrap.appendChild(btn);
 
-    // 5. The LED
+    // 5. LED Réaliste
     const led = document.createElement("div");
     led.className = "led";
     wrap.appendChild(led);
 
-    // 6. The Background (Shine effects)
+    // 6. Background avec Shine Effects
     const bg = document.createElement("div");
     bg.className = "bg";
     bg.innerHTML = `<div class="shine-1"></div><div class="shine-2"></div>`;
     wrap.appendChild(bg);
 
-    // 7. The Background Glow
+    // 7. Background Glow
     const bgGlow = document.createElement("div");
     bgGlow.className = "bg-glow";
     wrap.appendChild(bgGlow);
@@ -294,15 +304,14 @@ function renderButtons(profile) {
     let clickTimeout = null;
     let hasStartedDrag = false;
     
-    // Handle Click Events
-    wrap.addEventListener("click", (e) => {
+    // Handle Click Events - Utiliser l'input caché pour les états CSS
+    input.addEventListener("click", (e) => {
+      e.preventDefault(); // Empêcher le comportement checkbox par défaut
+      
       // Empêcher le clic si on vient de faire un drag
       if (hasStartedDrag) return;
       
-      // Visual Feedback (Active State)
-      wrap.classList.add("active");
-      setTimeout(() => wrap.classList.remove("active"), 200);
-      
+      // Visual Feedback via CSS states
       if (isEditMode) {
         // Mode Édition : Ouvre l'éditeur
         openEditor(profile.id, index);
@@ -310,8 +319,14 @@ function renderButtons(profile) {
         // Mode Réorganisation : Juste un feedback, le drag fait le travail
         toast("Maintenez et glissez pour réorganiser", 1500);
       } else {
-        // Mode Normal : Exécute l'action
+        // Mode Normal : Exécute l'action + état actif temporaire
+        input.checked = true; // Active le style CSS
         executeAction(b);
+        
+        // Désactiver après animation
+        setTimeout(() => {
+          input.checked = false;
+        }, 300);
       }
     });
     
@@ -362,12 +377,15 @@ function renderButtons(profile) {
       e.preventDefault();
       e.dataTransfer.dropEffect = "move";
       wrap.classList.add("drag-over");
+      // Effet hover pendant le drag
+      input.style.boxShadow = "0 0 20px rgba(0, 204, 255, 0.6)";
     });
 
     wrap.addEventListener("dragleave", (e) => {
       // Check if we're actually leaving the element (not just moving to a child)
       if (!wrap.contains(e.relatedTarget)) {
         wrap.classList.remove("drag-over");
+        input.style.boxShadow = "";
       }
     });
 
@@ -1160,7 +1178,7 @@ function stopAutoSync() {
 
 /* ========= AUTO-UPDATE DETECTION ========= */
 let updateCheckInterval = null;
-const CURRENT_VERSION = "0.36"; // Version actuelle
+const CURRENT_VERSION = "0.38"; // Version actuelle
 
 async function checkForUpdates() {
   // Détecter si c'est un écran tactile ou un PC normal

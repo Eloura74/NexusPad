@@ -1,0 +1,427 @@
+/* ========= REALISTIC 3D BUTTONS CSS ========= */
+/* Inspiré des designs hyper-réalistes avec LED et animations */
+
+.wrap {
+  --radius: 30px;
+  --bg: #000000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  position: relative;
+  pointer-events: none;
+  
+  /* Adaptation pour NexusPad Grid */
+  width: 120px;
+  height: 120px;
+  margin: 10px;
+}
+
+.wrap::before {
+  content: "";
+  position: absolute;
+  width: 350px;
+  height: 300px;
+  border-radius: 50px;
+  background-color: rgba(255, 255, 255, 0.05);
+  filter: blur(60px);
+  transform: skewY(-20deg);
+}
+
+.wrap::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50px;
+  background-color: rgba(0, 0, 0, 0.5);
+  filter: blur(30px);
+}
+
+.wrap input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  inset: 0;
+  z-index: 999;
+  cursor: pointer;
+  pointer-events: all;
+  user-select: none;
+}
+
+.button {
+  position: relative;
+  overflow: hidden;
+  width: 100px;  /* Adapté pour NexusPad */
+  height: 100px; /* Adapté pour NexusPad */
+  background-color: var(--bg);
+  z-index: 2;
+  border: transparent;
+  border-radius: var(--radius);
+  box-shadow:
+    inset 0 1px 1px rgb(255 255 255 / 40%),
+    inset 0 -6px 1px -4px #ff7300,
+    inset 0 -15px 6px -8px #ff6600;
+  transition: all 0.3s ease;
+}
+
+.button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: calc(var(--radius) * 0.8);
+  border-top: 30px solid #414244;    /* Réduit pour NexusPad */
+  border-left: 25px solid #2b2b2c;   /* Réduit pour NexusPad */
+  border-right: 25px solid #2b2b2c;  /* Réduit pour NexusPad */
+  border-bottom: 30px solid #15161a; /* Réduit pour NexusPad */
+  filter: blur(4px); /* Réduit pour NexusPad */
+  transition: all 0.5s ease;
+}
+
+.button::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: auto;
+  top: 101%;
+  height: 30px;  /* Réduit pour NexusPad */
+  width: 80px;   /* Réduit pour NexusPad */
+  border-radius: 50px 50px 0 0;
+  background: #ff7300;
+  filter: contrast(10) blur(5px); /* Réduit pour NexusPad */
+  transition: all 0.3s ease;
+  opacity: 1;
+}
+
+.button .corner {
+  transition: all 0.4s ease;
+  opacity: 0.1;
+}
+
+.button .corner::before,
+.button .corner::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  border-top: 35px solid white;    /* Réduit pour NexusPad */
+  border-left: 10px solid transparent;  /* Réduit pour NexusPad */
+  border-right: 10px solid transparent; /* Réduit pour NexusPad */
+  filter: blur(4px); /* Réduit pour NexusPad */
+}
+
+.button .corner::before {
+  left: 5px;  /* Ajusté pour NexusPad */
+  transform: rotate(-40deg);
+}
+
+.button .corner::after {
+  right: 5px; /* Ajusté pour NexusPad */
+  transform: rotate(40deg);
+}
+
+.wrap input:hover + .button .corner {
+  opacity: 0.15;
+}
+
+.button .inner {
+  z-index: 9;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  inset: 15px 12px; /* Ajusté pour NexusPad */
+  border-radius: calc(var(--radius) * 0.85);
+  background: linear-gradient(180deg, #232324 5%, #46484b 100%);
+  transition: all 0.3s ease;
+  box-shadow:
+    inset 0 -5px 15px -1px rgba(0, 0, 0, 0.3),
+    inset 0 -4px 3px -3px black,
+    inset 0 -10px 20px -8px rgb(255 255 255 / 40%),
+    inset 0 1px 0 1px rgb(255 255 255 / 20%);
+}
+
+/* Adaptation des icônes FontAwesome pour NexusPad */
+.button .inner i {
+  font-size: 18px !important;
+  color: #ff7a3c;
+  margin-bottom: 4px;
+  filter: drop-shadow(0 0 3px currentColor);
+}
+
+.button .inner .key-label {
+  font-size: 8px;
+  color: #cccccc;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.bg {
+  background-color: black;
+  position: absolute;
+  inset: -5px; /* Réduit pour NexusPad */
+  border-radius: calc(var(--radius) * 1.25);
+  box-shadow: 0 15px 8px -8px rgba(0, 0, 0, 0.3); /* Réduit pour NexusPad */
+  transition: all 0.3s ease;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.bg::before {
+  content: "";
+  position: absolute;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 -2px 0px -1px rgb(120 176 255 / 32%),
+    inset 0 0 5px 1px black,
+    inset 0 0 0 1px black;
+  inset: 0;
+  z-index: 1;
+}
+
+.bg .shine-1,
+.bg .shine-2::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  transition: all 0.3s ease;
+  background: rgb(255, 115, 0);
+  width: 8px;   /* Réduit pour NexusPad */
+  height: 8px;  /* Réduit pour NexusPad */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  border-radius: 50%;
+  filter: blur(2px);
+  transform: translateY(0) scale(0);
+  animation: bg 2.4s linear 0.3s;
+}
+
+.bg .shine-2::before {
+  animation: bg 2.4s linear infinite;
+}
+
+.bg .shine-2 {
+  transition: all 0.5s linear;
+  opacity: 0;
+}
+
+.led {
+  position: absolute;
+  z-index: 10;
+  top: 100%;
+  border-radius: 50%;
+  width: 4px;   /* Réduit pour NexusPad */
+  height: 4px;  /* Réduit pour NexusPad */
+  margin-top: 15px; /* Ajusté pour NexusPad */
+  transition: all 0.3s ease;
+  background-color: #f35f3a;
+  box-shadow:
+    0 -8px 25px 12px #ff5100,  /* Réduit pour NexusPad */
+    inset 0 1px 2px 0px rgba(255, 255, 255, 0.6),
+    0 0 0px 2px rgb(0 0 0 / 60%), /* Réduit pour NexusPad */
+    0 0 2px 3px rgba(152, 81, 0, 0.8); /* Réduit pour NexusPad */
+}
+
+/* ========= ÉTATS INTERACTIFS ========= */
+
+.wrap input:hover + .button {
+  transform: scale(1.02);
+}
+
+.wrap input:active + .button {
+  transform: scale(0.97);
+  filter: contrast(1.07);
+  background-color: transparent;
+}
+
+.wrap input:active + .button::before {
+  box-shadow: 0 -8px 8px 8px black; /* Ajusté pour NexusPad */
+}
+
+.wrap input:active + .button .inner {
+  background: linear-gradient(180deg, #232324 5%, #3b3d40 100%);
+  box-shadow:
+    inset 0 -5px 15px -1px rgba(0, 0, 0, 0.3),
+    inset 0 -4px 3px -3px black,
+    inset 0 -10px 20px -8px rgb(255 255 255 / 20%),
+    inset 0 1px 0 1px rgb(255 255 255 / 10%);
+  transform: scale(0.95);
+}
+
+/* ========= ÉTAT ACTIF (LED ALLUMÉE) ========= */
+
+.wrap input:checked + .button {
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.6),
+    inset 0 -6px 1px -4px #00ccff,
+    inset 0 -15px 6px -8px #0077cc,
+    0 0 12px 4px rgba(0, 204, 255, 0.5); /* Réduit pour NexusPad */
+  background-color: #2c3238;
+}
+
+.wrap input:checked + .button ~ .led {
+  background-color: #00ccff;
+  box-shadow:
+    0 -8px 25px 12px #00ccff,  /* LED active cyan */
+    inset 0 1px 2px 0px rgba(255, 255, 255, 0.8),
+    0 0 0px 2px rgba(0, 204, 255, 0.6),
+    0 0 2px 3px rgba(0, 153, 255, 0.9);
+  animation: ledPulse 1.5s infinite alternate;
+}
+
+@keyframes ledPulse {
+  0% {
+    box-shadow:
+      0 -8px 25px 12px #00ccff,
+      inset 0 1px 2px 0px rgba(255, 255, 255, 0.8),
+      0 0 0px 2px rgba(0, 204, 255, 0.6),
+      0 0 2px 3px rgba(0, 153, 255, 0.9);
+  }
+  100% {
+    box-shadow:
+      0 -8px 35px 18px #00ccff,
+      inset 0 1px 2px 0px rgba(255, 255, 255, 1),
+      0 0 0px 3px rgba(0, 204, 255, 0.8),
+      0 0 3px 4px rgba(0, 153, 255, 1);
+  }
+}
+
+/* ========= HOVER EFFECTS ========= */
+
+.wrap input:not(:checked):hover + .button ~ .bg .shine-2 {
+  opacity: 1;
+}
+
+.wrap input:not(:checked):hover + .button ~ .bg .shine-2::before {
+  background: rgba(0, 204, 255, 0.9);
+  filter: blur(3px);
+  animation: bgHover 2s infinite linear;
+}
+
+@keyframes bgHover {
+  0% {
+    transform: translateY(0) scale(0);
+  }
+  50% {
+    transform: translateY(-100px) scale(15); /* Ajusté pour NexusPad */
+  }
+  100% {
+    transform: translateY(-200px) scale(12); /* Ajusté pour NexusPad */
+  }
+}
+
+/* ========= BACKGROUND GLOW ========= */
+
+.bg-glow {
+  transition: all 0.5s linear;
+  position: absolute;
+  inset: -10px; /* Ajusté pour NexusPad */
+  z-index: 0;
+}
+
+.bg-glow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 30px;
+  background: linear-gradient(to bottom, #984fff 0%, black 100%);
+  filter: blur(8px); /* Réduit pour NexusPad */
+  opacity: 0;
+  animation: bgGlow 3s linear backwards;
+}
+
+@keyframes bgGlow {
+  0% { opacity: 0; }
+  40% { opacity: 1; }
+  80%, 100% { opacity: 0; }
+}
+
+.wrap input:checked + .button ~ .bg-glow::before {
+  background: linear-gradient(to bottom, #00ccff 0%, rgba(0, 0, 0, 0.7) 100%);
+  filter: blur(15px); /* Glow plus doux */
+  opacity: 0.8;
+  animation: bgGlowPulse 2s infinite alternate;
+}
+
+@keyframes bgGlowPulse {
+  0% {
+    opacity: 0.6;
+    filter: blur(15px);
+  }
+  100% {
+    opacity: 0.9;
+    filter: blur(20px);
+  }
+}
+
+/* ========= ANIMATION DU SHINE PRINCIPAL ========= */
+
+@keyframes bg {
+  0% {
+    transform: translateY(0) scale(0);
+  }
+  12% {
+    transform: translateY(0) scale(20); /* Ajusté pour NexusPad */
+  }
+  60%, 100% {
+    transform: translateY(-200px) scale(15, 12); /* Ajusté pour NexusPad */
+  }
+}
+
+/* ========= ACCENTS PAR COULEUR ========= */
+
+.button[data-accent="cyan"] {
+  --accent-color: #06b6d4;
+  --accent-dim: rgba(6, 182, 212, 0.4);
+}
+
+.button[data-accent="purple"] {
+  --accent-color: #a855f7;
+  --accent-dim: rgba(168, 85, 247, 0.4);
+}
+
+.button[data-accent="red"] {
+  --accent-color: #ef4444;
+  --accent-dim: rgba(239, 68, 68, 0.4);
+}
+
+.button[data-accent="green"] {
+  --accent-color: #22c55e;
+  --accent-dim: rgba(34, 197, 94, 0.4);
+}
+
+.button[data-accent="orange"] {
+  --accent-color: #f97316;
+  --accent-dim: rgba(249, 115, 22, 0.4);
+}
+
+/* Application des couleurs d'accent */
+.button[data-accent="cyan"] .inner i {
+  color: var(--accent-color);
+}
+
+.wrap input:checked + .button[data-accent="cyan"] {
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.6),
+    inset 0 -6px 1px -4px var(--accent-color),
+    inset 0 -15px 6px -8px var(--accent-dim),
+    0 0 12px 4px var(--accent-dim);
+}
+
+.wrap input:checked + .button[data-accent="cyan"] ~ .led {
+  background-color: var(--accent-color);
+  box-shadow:
+    0 -8px 25px 12px var(--accent-color),
+    inset 0 1px 2px 0px rgba(255, 255, 255, 0.8),
+    0 0 0px 2px var(--accent-dim),
+    0 0 2px 3px var(--accent-color);
+}
+
+/* Répéter pour les autres couleurs... */
