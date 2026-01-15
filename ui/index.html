@@ -8,8 +8,8 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <link rel="stylesheet" href="./css/theme.css?v=0.23" />
-  <link rel="stylesheet" href="./css/cube.css?v=0.23" />
+  <link rel="stylesheet" href="./css/theme.css?v=0.35" />
+  <link rel="stylesheet" href="./css/cube.css?v=0.35" />
   <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -26,7 +26,7 @@
       <div class="flex items-center gap-3">
         <div id="pcStatusDot" class="w-2.5 h-2.5 rounded-full dot-off shadow-[0_0_8px_currentColor]"></div>
         <h1 class="text-lg font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500" style="font-family: 'Orbitron', sans-serif;">
-          NEXUSPAD <span class="text-[10px] text-slate-500 font-mono ml-1 align-top">v0.23</span>
+          NEXUSPAD <span class="text-[10px] text-slate-500 font-mono ml-1 align-top">v0.35</span>
         </h1>
       </div>
       
@@ -35,6 +35,14 @@
           <span id="pcStatusText">PC offline</span>
         </div>
         
+        <button id="btnEditMode" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-cyan-400 transition-colors" title="Mode Édition (Paramètres)">
+          <i class="fa-solid fa-cog"></i>
+        </button>
+
+        <button id="btnReorganizeMode" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-purple-400 transition-colors" title="Mode Réorganisation (Drag & Drop)">
+          <i class="fa-solid fa-arrows-up-down-left-right"></i>
+        </button>
+
         <button id="btnSleep" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-cyan-400 transition-colors" title="Éteindre l'écran">
           <i class="fa-solid fa-power-off"></i>
         </button>
@@ -64,11 +72,6 @@
           
           <div class="mt-auto w-8 h-px bg-white/10"></div>
 
-          <!-- Edit Mode Toggle -->
-          <button id="btnEditMode" class="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-slate-400 transition-all" title="Verrouiller / Déverrouiller">
-            <i class="fa-solid fa-lock"></i>
-          </button>
-          
           <!-- Info / CPU (Minimal) -->
           <div class="text-[9px] font-mono text-slate-600 text-center leading-tight">
             <div>CPU</div>
@@ -83,8 +86,8 @@
           <div class="text-[10px] text-slate-500 font-bold tracking-wider uppercase opacity-50">Stream Deck Layout</div>
         </div>
       <!-- Grid Container -->
-      <div id="grid" class="flex-1 grid gap-4 p-4 overflow-y-auto no-scrollbar content-start justify-center" 
-           style="grid-template-columns: repeat(auto-fit, 120px); grid-auto-rows: 120px;">
+      <div id="grid" class="flex-1 grid gap-6 p-4 overflow-y-auto no-scrollbar content-start justify-center" 
+           style="grid-template-columns: repeat(auto-fit, 120px); grid-auto-rows: 120px; row-gap: 2rem;">
         <!-- Buttons injected by JS -->
       </div></section>
 
@@ -198,6 +201,6 @@
   </div>
 
   <div class="noise"></div>
-  <script src="./js/app.js?v=0.23"></script>
+  <script src="./js/app.js?v=0.35"></script>
 </body>
 </html>

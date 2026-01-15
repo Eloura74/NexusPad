@@ -113,33 +113,11 @@ header.glass {
   justify-content: center;
   flex-direction: column;
   position: relative;
-  /* pointer-events: none;  <-- Removed to allow interaction */
 }
 
-/* Background Blur/Glow behind the key */
-.key-wrap::before {
-  content: "";
-  position: absolute;
-  width: 150%; /* Larger than container */
-  height: 150%;
-  border-radius: 40px;
-  background-color: rgba(255, 255, 255, 0.05);
-  filter: blur(40px);
-  transform: skewY(-20deg);
-  pointer-events: none;
-  z-index: 0;
-}
+/* Background Blur/Glow behind the key - SUPPRIMÉ pour un look plus propre */
 
-.key-wrap::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: var(--radius);
-  background-color: rgba(0, 0, 0, 0.5);
-  filter: blur(20px);
-  z-index: 0;
-}
+/* Background shadow - SUPPRIMÉ également */
 
 /* The Button Itself */
 .key {
@@ -153,28 +131,15 @@ header.glass {
   border-radius: var(--radius);
   box-shadow:
     inset 0 1px 1px rgb(255 255 255 / 40%),
-    inset 0 -6px 1px -4px #ff7300,
-    inset 0 -15px 6px -8px #ff6600;
+    inset 0 -6px 1px -4px #8b5cf6,
+    inset 0 -15px 6px -8px #7c3aed;
   transition: all 0.3s ease;
   cursor: pointer;
 }
 
-/* Bezel/Frame */
-.key::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: calc(var(--radius) * 0.8);
-  border-top: 36px solid #414244;
-  border-left: 36px solid #2b2b2c;
-  border-right: 36px solid #2b2b2c;
-  border-bottom: 36px solid #15161a;
-  filter: blur(4px);
-  transition: all 0.5s ease;
-  pointer-events: none;
-}
+/* Bezel/Frame - SUPPRIMÉ pour un look plus propre */
 
-/* Bottom Highlight/Reflection */
+/* Bottom Highlight/Reflection - Supprimé pour un look plus propre */
 .key::after {
   content: "";
   position: absolute;
@@ -185,10 +150,10 @@ header.glass {
   height: 40px;
   width: 80%;
   border-radius: 50px 50px 0 0;
-  background: #ff7300;
-  filter: contrast(10) blur(7px);
+  background: #8b5cf6;
+  filter: contrast(8) blur(7px);
   transition: all 0.3s ease;
-  opacity: 1;
+  opacity: 0; /* Masqué */
   pointer-events: none;
 }
 
@@ -261,28 +226,7 @@ header.glass {
   text-shadow: 0 1px 0 rgba(255,255,255,0.2);
 }
 
-/* Background Animation Elements */
-.bg {
-  position: absolute;
-  inset: -5px;
-  border-radius: calc(var(--radius) * 1.25);
-  box-shadow: 0 20px 10px -10px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
-  overflow: hidden;
-  z-index: 1;
-  pointer-events: none;
-}
-.bg::before {
-  content: "";
-  position: absolute;
-  border-radius: inherit;
-  box-shadow:
-    inset 0 -2px 0px -1px rgb(120 176 255 / 32%),
-    inset 0 0 5px 1px black,
-    inset 0 0 0 1px black;
-  inset: 0;
-  z-index: 1;
-}
+/* Background Animation Elements - SUPPRIMÉ pour un look plus propre */
 
 .shine-1,
 .shine-2::before {
@@ -290,7 +234,7 @@ header.glass {
   position: absolute;
   z-index: 0;
   transition: all 0.3s ease;
-  background: rgb(255, 115, 0);
+  background: rgb(139, 92, 246);
   width: 8px;
   height: 8px;
   left: 0;
@@ -310,7 +254,7 @@ header.glass {
   opacity: 0;
 }
 
-/* LED Indicator */
+/* LED Indicator - Box-shadow supprimé */
 .led {
   position: absolute;
   z-index: 10;
@@ -318,14 +262,9 @@ header.glass {
   border-radius: 50%;
   width: 6px;
   height: 6px;
-  margin-top: 16px; /* Adjusted for spacing */
+  margin-top: 16px;
   transition: all 0.3s ease;
-  background-color: #f35f3a;
-  box-shadow:
-    0 -10px 35px 17px #ff5100,
-    inset 0 1px 2px 0px rgba(255, 255, 255, 0.6),
-    0 0 0px 3px rgb(0 0 0 / 60%),
-    0 0 2px 4px rgba(152, 81, 0, 0.8);
+  background-color: #9333ea;
 }
 
 /* Noise Texture */
@@ -476,7 +415,7 @@ header.glass {
 
 /* Edit Mode Indicators */
 body.edit-mode .key-wrap {
-  cursor: grab;
+  cursor: pointer;
 }
 
 body.edit-mode .key-wrap:hover {
@@ -484,8 +423,19 @@ body.edit-mode .key-wrap:hover {
   transition: transform 0.2s ease;
 }
 
+/* Mode Réorganisation */
+body.reorganize-mode .key-wrap {
+  cursor: grab;
+}
+
+body.reorganize-mode .key-wrap:hover {
+  transform: scale(1.02);
+  transition: transform 0.2s ease;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+}
+
 body.edit-mode .key-wrap::after {
-  content: "⋮⋮";
+  content: "⚙";
   position: absolute;
   top: 4px;
   right: 4px;
@@ -499,6 +449,24 @@ body.edit-mode .key-wrap::after {
 }
 
 body.edit-mode .key-wrap:hover::after {
+  opacity: 1;
+}
+
+body.reorganize-mode .key-wrap::after {
+  content: "↕";
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  color: rgba(168, 85, 247, 0.6);
+  font-size: 14px;
+  font-weight: bold;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+body.reorganize-mode .key-wrap:hover::after {
   opacity: 1;
 }
 

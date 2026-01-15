@@ -35,7 +35,8 @@ const dbg = (...args) => { if (DEBUG) console.log("[UI]", ...args); };
 let cfg = null;
 let currentProfile = null;
 let editingButton = null; // { profileId, index }
-let isEditMode = false; // Default Locked
+let isEditMode = false; // Default Locked - Mode Édition Paramètres
+let isReorganizeMode = false; // Mode Réorganisation Drag & Drop
 
 let ws = null;
 let wsReconnectTimer = null;
@@ -98,6 +99,9 @@ function saveConfig() {
   if (!cfg) return;
   localStorage.setItem("nexuspad_config", JSON.stringify(cfg));
   dbg("Saved config to localStorage");
+  
+  // Déclencher sync manuelle après sauvegarde
+  setTimeout(syncConfigOnDemand, 100);
 }
 
 /* ========= PROFILES / GRID ========= */
@@ -234,8 +238,7 @@ function renderButtons(profile) {
     // 1. The Wrapper (corresponds to .wrap)
     const wrap = document.createElement("div");
     wrap.className = "key-wrap"; // We'll use .key-wrap instead of .wrap to match existing logic
-    wrap.draggable = isEditMode; // Only draggable in edit mode
-    wrap.dataset.index = index;
+    wrap.dataset.index = index; // IMPORTANT : Toujours définir l'index pour le touch drag
 
     // 2. The Button (corresponds to .button)
     const btn = document.createElement("div");
@@ -287,92 +290,117 @@ function renderButtons(profile) {
     // --- Interaction Logic ---
     
     // Handle Click
-    // Handle Click
+    // Handle Click avec délai pour distinguer du drag
+    let clickTimeout = null;
+    let hasStartedDrag = false;
+    
+    // Handle Click Events
     wrap.addEventListener("click", (e) => {
-      if (isDragging) return;
+      // Empêcher le clic si on vient de faire un drag
+      if (hasStartedDrag) return;
       
       // Visual Feedback (Active State)
       wrap.classList.add("active");
       setTimeout(() => wrap.classList.remove("active"), 200);
-
+      
       if (isEditMode) {
-        // Edit Mode: Open Editor
+        // Mode Édition : Ouvre l'éditeur
         openEditor(profile.id, index);
+      } else if (isReorganizeMode) {
+        // Mode Réorganisation : Juste un feedback, le drag fait le travail
+        toast("Maintenez et glissez pour réorganiser", 1500);
       } else {
-        // Run Mode: Execute Action
+        // Mode Normal : Exécute l'action
         executeAction(b);
       }
     });
+    
+    // Plus besoin des event listeners mousedown/touchstart/mouseup/touchend
+    // car on utilise maintenant directement "click"
 
-    // Drag Events (Only in edit mode)
-    if (isEditMode) {
-      wrap.addEventListener("dragstart", (e) => {
-        isDragging = true;
-        e.dataTransfer.setData("text/plain", index);
-        e.dataTransfer.effectAllowed = "move";
-        wrap.classList.add("dragging");
-        
-        // Add visual feedback to all other buttons
-        setTimeout(() => {
-          document.querySelectorAll(".key-wrap").forEach(w => {
-            if (w !== wrap) {
-              w.classList.add("drop-target");
-            }
-          });
-        }, 50);
-      });
-
-      wrap.addEventListener("dragend", () => {
-        isDragging = false;
-        wrap.classList.remove("dragging");
+    // Drag Events (Toujours configurés, mais conditionnés)
+    wrap.addEventListener("dragstart", (e) => {
+      if (!isReorganizeMode) {
+        e.preventDefault();
+        return false;
+      }
+      
+      hasStartedDrag = true;
+      isDragging = true;
+      
+      console.log("Drag started for button:", b.label);
+      
+      e.dataTransfer.setData("text/plain", index);
+      e.dataTransfer.effectAllowed = "move";
+      wrap.classList.add("dragging");
+      
+      // Add visual feedback to all other buttons
+      setTimeout(() => {
         document.querySelectorAll(".key-wrap").forEach(w => {
-          w.classList.remove("drag-over", "drop-target");
+          if (w !== wrap) {
+            w.classList.add("drop-target");
+          }
         });
-      });
+      }, 50);
+    });
 
-      wrap.addEventListener("dragover", (e) => {
-        if (!isDragging) return;
-        e.preventDefault();
-        e.dataTransfer.dropEffect = "move";
-        wrap.classList.add("drag-over");
+    wrap.addEventListener("dragend", () => {
+      isDragging = false;
+      wrap.classList.remove("dragging");
+      document.querySelectorAll(".key-wrap").forEach(w => {
+        w.classList.remove("drag-over", "drop-target");
       });
+      
+      // Délai avant de permettre les clics pour éviter les conflits
+      setTimeout(() => {
+        hasStartedDrag = false;
+      }, 100);
+    });
 
-      wrap.addEventListener("dragleave", (e) => {
-        // Check if we're actually leaving the element (not just moving to a child)
-        if (!wrap.contains(e.relatedTarget)) {
-          wrap.classList.remove("drag-over");
-        }
-      });
+    wrap.addEventListener("dragover", (e) => {
+      if (!isDragging || !isReorganizeMode) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      wrap.classList.add("drag-over");
+    });
 
-      wrap.addEventListener("drop", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+    wrap.addEventListener("dragleave", (e) => {
+      // Check if we're actually leaving the element (not just moving to a child)
+      if (!wrap.contains(e.relatedTarget)) {
         wrap.classList.remove("drag-over");
-        const fromIndex = parseInt(e.dataTransfer.getData("text/plain"));
-        const toIndex = index;
+      }
+    });
 
-        if (fromIndex === toIndex || isNaN(fromIndex)) return;
-
-        // Swap in data
-        const buttons = profile.buttons;
-        if (!buttons[fromIndex] || !buttons[toIndex]) return;
-
-        const temp = buttons[fromIndex];
-        buttons[fromIndex] = buttons[toIndex];
-        buttons[toIndex] = temp;
-
+    wrap.addEventListener("drop", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      wrap.classList.remove("drag-over");
+      
+      if (!isDragging || !isReorganizeMode) return;
+      
+      const fromIndex = parseInt(e.dataTransfer.getData("text/plain"));
+      const toIndex = index;
+      
+      if (fromIndex !== toIndex) {
+        // Approche par insertion (plus naturel que swap)
+        const movedItem = profile.buttons.splice(fromIndex, 1)[0];
+        profile.buttons.splice(toIndex, 0, movedItem);
+        
         saveConfig();
-        renderButtons(profile); // Re-render the grid after swap
-        toast(`Touches ${fromIndex + 1} ↔ ${toIndex + 1} échangées`, 1500);
-      });
-    }
+        renderButtons(profile);
+        toast("Position mise à jour", 1500);
+      }
+    });
+    
+    // IMPORTANT : Définir draggable selon le mode ACTUEL
+    wrap.draggable = isReorganizeMode;
 
     elGrid.appendChild(wrap);
 
   });
   
   // Add "New Button" placeholder (Only in Edit Mode)
-  if (isEditMode) {
+  if (isEditMode || isReorganizeMode) {
       const wrapAdd = document.createElement("div");
       wrapAdd.className = "key-wrap editable";
       const btnAdd = document.createElement("button");
@@ -619,10 +647,71 @@ function updatePayloadInput(type, value = "") {
       <textarea name="payload" rows="3" class="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-slate-100 font-mono text-sm focus:border-cyan-400 outline-none transition-colors" placeholder="echo 'Hello'">${escapeHtml(value)}</textarea>
     `;
   } else {
-    // Run / Default
+    // Run / Default - Ajouter bouton parcourir
     container.innerHTML = `
-      <input type="text" name="payload" class="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-slate-100 font-mono text-sm focus:border-cyan-400 outline-none transition-colors" placeholder="Ex: notepad.exe" value="${escapeHtml(value)}">
+      <div class="flex gap-2">
+        <input type="text" name="payload" class="flex-1 bg-white/5 border border-white/10 rounded px-3 py-2 text-slate-100 font-mono text-sm focus:border-cyan-400 outline-none transition-colors" placeholder="Ex: C:\\Program Files\\..." value="${escapeHtml(value)}">
+        <button type="button" id="btnBrowseProgram" class="px-3 py-2 rounded bg-white/10 hover:bg-white/20 text-xs uppercase tracking-wider whitespace-nowrap">
+          <i class="fa-solid fa-folder-open mr-1"></i>Parcourir
+        </button>
+        <input type="file" id="programFileInput" accept=".exe,.bat,.cmd,.msi" class="hidden">
+      </div>
+      <div class="text-[9px] text-slate-500 mt-1 italic">Cliquez sur "Parcourir" pour sélectionner un programme depuis votre PC</div>
+      <div class="mt-2 flex gap-1 flex-wrap">
+        <button type="button" class="program-shortcut px-2 py-1 rounded bg-gray-600 hover:bg-gray-500 text-[9px] uppercase tracking-wider" data-path="C:\\Windows\\System32\\notepad.exe">Notepad</button>
+        <button type="button" class="program-shortcut px-2 py-1 rounded bg-gray-600 hover:bg-gray-500 text-[9px] uppercase tracking-wider" data-path="C:\\Windows\\System32\\calc.exe">Calculette</button>
+        <button type="button" class="program-shortcut px-2 py-1 rounded bg-gray-600 hover:bg-gray-500 text-[9px] uppercase tracking-wider" data-path="chrome.exe --app=https://google.com">Chrome</button>
+        <button type="button" class="program-shortcut px-2 py-1 rounded bg-gray-600 hover:bg-gray-500 text-[9px] uppercase tracking-wider" data-path="explorer.exe">Explorateur</button>
+      </div>
     `;
+    
+    // Ajouter l'événement pour le bouton parcourir
+    const btnBrowse = container.querySelector("#btnBrowseProgram");
+    const fileInputProgram = container.querySelector("#programFileInput");
+    const payloadInput = container.querySelector("input[name='payload']");
+    
+    if (btnBrowse && fileInputProgram && payloadInput) {
+      btnBrowse.addEventListener("click", () => {
+        fileInputProgram.click();
+      });
+      
+      fileInputProgram.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          // Sur Windows, on peut récupérer le chemin complet
+          // Note: Pour des raisons de sécurité, les navigateurs modernes ne donnent pas le chemin complet
+          // On va utiliser le nom du fichier et demander à l'utilisateur de compléter
+          const fileName = file.name;
+          
+          // Si c'est un .exe connu, on peut suggérer des chemins courants
+          if (fileName.toLowerCase().includes('notepad')) {
+            payloadInput.value = 'C:\\Windows\\System32\\notepad.exe';
+          } else if (fileName.toLowerCase().includes('calc')) {
+            payloadInput.value = 'C:\\Windows\\System32\\calc.exe';
+          } else if (fileName.toLowerCase().includes('chrome')) {
+            payloadInput.value = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+          } else if (fileName.toLowerCase().includes('firefox')) {
+            payloadInput.value = 'C:\\Program Files\\Mozilla Firefox\\firefox.exe';
+          } else if (fileName.toLowerCase().includes('code')) {
+            payloadInput.value = 'C:\\Users\\' + (navigator.userAgent.includes('Windows') ? '%USERNAME%' : 'user') + '\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe';
+          } else {
+            // Pour les autres, suggérer le nom et demander de compléter
+            payloadInput.value = fileName;
+            toast("Complétez le chemin complet du programme", 3000);
+          }
+        }
+      });
+      
+      // Ajouter les événements pour les raccourcis programmes
+      const shortcuts = container.querySelectorAll(".program-shortcut");
+      shortcuts.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const path = btn.getAttribute("data-path");
+          payloadInput.value = path;
+          toast(`Programme sélectionné: ${btn.textContent}`, 1500);
+        });
+      });
+    }
   }
 }
 
@@ -779,37 +868,85 @@ setInterval(() => {
 
 /* ========= CONFIG BUTTON ========= */
 /* ========= CONFIG BUTTON ========= */
-/* ========= CONFIG BUTTON (Now Edit Mode Toggle) ========= */
-const btnEditMode = document.getElementById("btnEditMode");
-if (btnEditMode) {
-    btnEditMode.addEventListener("click", () => {
-        isEditMode = !isEditMode;
-        
-        // Update Icon
-        const icon = btnEditMode.querySelector("i");
-        if (isEditMode) {
-            icon.className = "fa-solid fa-lock-open text-cyan-400";
-            btnEditMode.classList.add("border-cyan-500/50", "bg-cyan-500/10");
-            document.body.classList.add("edit-mode");
-            toast("Mode Édition ACTIVÉ - Drag & Drop disponible", 2000);
-        } else {
-            icon.className = "fa-solid fa-lock";
-            btnEditMode.classList.remove("border-cyan-500/50", "bg-cyan-500/10");
-            document.body.classList.remove("edit-mode");
-            toast("Mode Édition DÉSACTIVÉ", 1000);
-        }
-        
-        // Re-render to update drag handlers and click logic
-        if (currentProfile) renderButtons(currentProfile);
-    });
-}
+/* ========= EDIT MODE SYSTEM ========= */
+function setupEditMode() {
+    const btnEditMode = document.getElementById("btnEditMode");
+    const btnReorganizeMode = document.getElementById("btnReorganizeMode");
+    
+    // Mode Édition (Paramètres)
+    if (btnEditMode) {
+        btnEditMode.addEventListener("click", () => {
+            // Désactiver mode réorganisation si actif
+            if (isReorganizeMode) {
+                isReorganizeMode = false;
+                const iconReorg = btnReorganizeMode.querySelector("i");
+                iconReorg.className = "fa-solid fa-arrows-up-down-left-right";
+                btnReorganizeMode.classList.remove("border-purple-500/50", "bg-purple-500/10");
+            }
+            
+            isEditMode = !isEditMode;
+            console.log("Edit mode toggled:", isEditMode);
+            
+            // Update Icon
+            const icon = btnEditMode.querySelector("i");
+            if (isEditMode) {
+                icon.className = "fa-solid fa-cog text-cyan-400";
+                btnEditMode.classList.add("border-cyan-500/50", "bg-cyan-500/10");
+                document.body.classList.add("edit-mode");
+                toast("Mode Édition ACTIVÉ - Clic pour paramétrer", 2000);
+            } else {
+                icon.className = "fa-solid fa-cog";
+                btnEditMode.classList.remove("border-cyan-500/50", "bg-cyan-500/10");
+                document.body.classList.remove("edit-mode");
+                toast("Mode Édition DÉSACTIVÉ", 1000);
+            }
+            
+            // Re-render to update click logic
+            if (currentProfile) renderButtons(currentProfile);
+        });
+    }
+    
+    // Mode Réorganisation (Drag & Drop)
+    if (btnReorganizeMode) {
+        btnReorganizeMode.addEventListener("click", () => {
+            // Désactiver mode édition si actif
+            if (isEditMode) {
+                isEditMode = false;
+                const iconEdit = btnEditMode.querySelector("i");
+                iconEdit.className = "fa-solid fa-cog";
+                btnEditMode.classList.remove("border-cyan-500/50", "bg-cyan-500/10");
+                document.body.classList.remove("edit-mode");
+            }
+            
+            isReorganizeMode = !isReorganizeMode;
+            console.log("Reorganize mode toggled:", isReorganizeMode);
+            
+            // Update Icon
+            const icon = btnReorganizeMode.querySelector("i");
+            if (isReorganizeMode) {
+                icon.className = "fa-solid fa-arrows-up-down-left-right text-purple-400";
+                btnReorganizeMode.classList.add("border-purple-500/50", "bg-purple-500/10");
+                document.body.classList.add("reorganize-mode");
+                toast("Mode Réorganisation ACTIVÉ - Glissez pour déplacer", 2000);
+            } else {
+                icon.className = "fa-solid fa-arrows-up-down-left-right";
+                btnReorganizeMode.classList.remove("border-purple-500/50", "bg-purple-500/10");
+                document.body.classList.remove("reorganize-mode");
+                toast("Mode Réorganisation DÉSACTIVÉ", 1000);
+            }
+            
+            // Re-render to update drag logic
+            if (currentProfile) renderButtons(currentProfile);
+        });
+    }
 
-// Old Config Button (Top Right) - maybe keep as a shortcut or remove?
-// Let's make it also toggle edit mode for now
-if (btnConfig) {
-  btnConfig.addEventListener("click", () => {
-      if (btnEditMode) btnEditMode.click();
-  });
+    // Old Config Button (Top Right) - Open config overlay
+    if (btnConfig) {
+      btnConfig.addEventListener("click", () => {
+          // Toggle edit mode
+          if (btnEditMode) btnEditMode.click();
+      });
+    }
 }
 
 /* ========= SLEEP MODE ========= */
@@ -848,11 +985,84 @@ if (btnSleep && elSleepOverlay) {
 let lastConfigHash = null;
 let syncInterval = null;
 
-async function startAutoSync() {
-  let consecutiveErrors = 0;
-  const maxErrors = 3;
+async function syncConfigOnDemand() {
+  // Synchronisation UNIQUEMENT à la demande (après sauvegarde)
+  console.log("🔄 Synchronisation manuelle de la configuration...");
   
-  // Synchronisation plus aggressive : toutes les 2 secondes
+  try {
+    // Essayer plusieurs URLs pour la sync cross-device
+    const urls = [
+      './profiles.json?t=' + Date.now(),
+      `http://192.168.1.86:8091/profiles.json?t=${Date.now()}`,
+      `http://macropad.lan/profiles.json?t=${Date.now()}`
+    ];
+    
+    let response = null;
+    
+    for (const url of urls) {
+      try {
+        response = await fetch(url, {
+          method: 'GET',
+          cache: 'no-cache',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        });
+        if (response.ok) break;
+      } catch (e) {
+        // Try next URL
+      }
+    }
+    
+    if (response && response.ok) {
+      const remoteConfig = await response.text();
+      const newHash = JSON.stringify(remoteConfig);
+      
+      if (lastConfigHash && newHash !== lastConfigHash) {
+        console.log("🔄 Configuration mise à jour détectée, rechargement...");
+        
+        try {
+          const parsedConfig = JSON.parse(remoteConfig);
+          cfg = parsedConfig;
+          
+          // Preserve current profile if it still exists
+          const currentProfileId = currentProfile?.id;
+          renderProfileButtons();
+          
+          if (currentProfileId) {
+            const stillExists = cfg.profiles?.find(p => p.id === currentProfileId);
+            if (stillExists) {
+              currentProfile = stillExists;
+            } else if (cfg.profiles?.length > 0) {
+              currentProfile = cfg.profiles[0];
+            }
+          }
+          
+          if (currentProfile) {
+            renderButtons(currentProfile);
+          }
+          
+          toast("Configuration synchronisée", 1000);
+        } catch (parseError) {
+          console.error("Erreur parsing remote config:", parseError);
+        }
+      }
+      lastConfigHash = newHash;
+    }
+    
+  } catch (error) {
+    console.warn("Sync manuelle échouée:", error);
+  }
+}
+
+async function startAutoSync() {
+  if (syncInterval) return; // Déjà actif
+  
+  console.log("🔄 Démarrage de la synchronisation automatique (10s)");
+  
+  // Sync immédiate puis toutes les 10 secondes (moins agressif)
   syncInterval = setInterval(async () => {
     try {
       // Essayer plusieurs URLs pour la sync cross-device
@@ -886,7 +1096,7 @@ async function startAutoSync() {
       const newConfig = await response.json();
       const newHash = JSON.stringify(newConfig);
       
-      if (lastConfigHash && lastConfigHash !== newHash) {
+      if (lastConfigHash && newHash !== lastConfigHash) {
         console.log("🔄 Configuration changée détectée - Mise à jour de l'interface");
         cfg = newConfig;
         
@@ -935,11 +1145,10 @@ async function startAutoSync() {
       consecutiveErrors++;
       if (consecutiveErrors >= maxErrors) {
         console.warn("Sync failed after", maxErrors, "attempts:", error);
-        toast("⚠️ Synchronisation échouée", 1000);
-        consecutiveErrors = 0; // Reset pour réessayer
+        stopAutoSync();
       }
     }
-  }, 2000); // Plus fréquent pour une meilleure réactivité
+  }, 10000); // Toutes les 10 secondes (moins de clignotement)
 }
 
 function stopAutoSync() {
@@ -951,7 +1160,7 @@ function stopAutoSync() {
 
 /* ========= AUTO-UPDATE DETECTION ========= */
 let updateCheckInterval = null;
-const CURRENT_VERSION = "0.23"; // Version actuelle
+const CURRENT_VERSION = "0.35"; // Version actuelle
 
 async function checkForUpdates() {
   // Détecter si c'est un écran tactile ou un PC normal
@@ -960,14 +1169,14 @@ async function checkForUpdates() {
                        window.location.hostname.includes('109'); // IP du pad7
   
   if (isTouchDevice) {
-    // Écran tactile : Auto-update fréquent 
-    setTimeout(checkVersionNow, 1000);
-    updateCheckInterval = setInterval(checkVersionNow, 5000);
-    console.log("🔄 Auto-update TACTILE activé (5s interval)");
+    // Écran tactile : Auto-update très espacé pour éviter les interruptions
+    setTimeout(checkVersionNow, 10000); // 10 secondes au démarrage
+    updateCheckInterval = setInterval(checkVersionNow, 300000); // 5 minutes
+    console.log("🔄 Auto-update TACTILE activé (5min interval)");
   } else {
-    // PC normal : Check moins fréquent pour éviter les glitches
-    updateCheckInterval = setInterval(checkVersionNow, 60000); // 1 minute
-    console.log("🔄 Auto-update PC activé (60s interval)");
+    // PC normal : Check très peu fréquent
+    updateCheckInterval = setInterval(checkVersionNow, 600000); // 10 minutes
+    console.log("🔄 Auto-update PC activé (10min interval)");
   }
 }
 
@@ -1008,6 +1217,94 @@ async function checkVersionNow() {
     }
 }
 
+/* ========= TOUCH DRAG SUPPORT ========= */
+let touchDragData = null;
+
+function enableTouchDrag() {
+    console.log("🤏 Activation du support tactile pour le Drag & Drop");
+    
+    document.addEventListener("touchstart", function(e) {
+        if (!isReorganizeMode) return;
+        const target = e.target.closest('.key-wrap');
+        if (target && target.draggable) {
+            // Empêcher le comportement par défaut (scroll)
+            e.preventDefault();
+            
+            // Simuler le dragstart
+            target.style.opacity = "0.6";
+            target.classList.add("dragging");
+            
+            // Stocker les données de drag
+            touchDragData = {
+                element: target,
+                fromIndex: parseInt(target.dataset.index),
+                startY: e.touches[0].clientY,
+                startX: e.touches[0].clientX
+            };
+            
+            // Feedback visuel pour les autres boutons
+            document.querySelectorAll(".key-wrap").forEach(w => {
+                if (w !== target) {
+                    w.classList.add("drop-target");
+                }
+            });
+            
+            toast("Déplacement en cours...", 1000);
+        }
+    }, { passive: false });
+
+    document.addEventListener("touchmove", function(e) {
+        if (isReorganizeMode && touchDragData) {
+            e.preventDefault(); // Empêche le scroll de la page
+            
+            const touch = e.touches[0];
+            const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            const targetWrap = elementBelow ? elementBelow.closest('.key-wrap') : null;
+            
+            // Nettoyer les anciens highlights
+            document.querySelectorAll(".key-wrap").forEach(w => {
+                w.classList.remove("drag-over");
+            });
+            
+            // Highlight la cible actuelle
+            if (targetWrap && targetWrap !== touchDragData.element) {
+                targetWrap.classList.add("drag-over");
+            }
+        }
+    }, { passive: false });
+
+    document.addEventListener("touchend", function(e) {
+        if (!touchDragData) return;
+        
+        const touch = e.changedTouches[0];
+        const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+        const targetWrap = elementBelow ? elementBelow.closest('.key-wrap') : null;
+        
+        if (targetWrap && targetWrap !== touchDragData.element && targetWrap.dataset.index !== undefined) {
+            const toIndex = parseInt(targetWrap.dataset.index);
+            const fromIndex = touchDragData.fromIndex;
+            
+            if (fromIndex !== toIndex && currentProfile) {
+                // Approche par insertion (plus naturel)
+                const movedItem = currentProfile.buttons.splice(fromIndex, 1)[0];
+                currentProfile.buttons.splice(toIndex, 0, movedItem);
+                
+                saveConfig();
+                renderButtons(currentProfile);
+                toast("Position mise à jour", 1500);
+            }
+        }
+        
+        // Nettoyer les états visuels
+        document.querySelectorAll(".key-wrap").forEach(w => {
+            w.classList.remove("dragging", "drop-target", "drag-over");
+            w.style.opacity = "";
+        });
+        
+        touchDragData = null;
+    }, { passive: false });
+}
+
 /* ========= INIT ========= */
 // Removed elSelect listener
 
@@ -1028,12 +1325,15 @@ async function checkVersionNow() {
     setPcStatus(false);
     connectWs();
     
-    // Démarrer la synchronisation automatique
-    startAutoSync();
+    // Setup edit mode après que le DOM soit prêt
+    setupEditMode();
     
-    // Auto-reload pour écrans tactiles (détection de nouvelle version)
+    // Activer le support tactile pour le drag & drop
+    enableTouchDrag();
+    
+    // Auto-reload pour écrans tactiles (détection de nouvelle version) - RÉDUIT
     checkForUpdates();
-    toast("🔄 Synchronisation automatique activée", 2000);
+    toast("Interface initialisée", 1500);
 
   } catch (e) {
     toast(String(e?.message ?? e), 2500);
