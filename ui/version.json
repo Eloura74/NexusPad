@@ -1,0 +1,13 @@
+{
+  "version": "0.42",
+  "timestamp": 1768516624,
+  "description": "Layout Pro + Modes UX + Boutons Réalistes",
+  "features": [
+    "Layout fixe 4x3 sans scroll",
+    "Modes UX professionnels avec overlays",
+    "Boutons 3D réalistes adaptatifs",
+    "Gestion stricte des interactions",
+    "Synchronisation version.json"
+  ],
+  "breaking_changes": false
+}

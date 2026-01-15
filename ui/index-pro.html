@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="fr"> 
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>NexusPad Pro</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="stylesheet" href="./css/theme.css?v=0.42" />
+  <link rel="stylesheet" href="./css/cube.css?v=0.42" />
+  <link rel="stylesheet" href="./css/realistic-buttons.css?v=0.42" />
+  <link rel="stylesheet" href="./css/layout-pro.css?v=0.42" />
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+<div id="app">
+  
+  <!-- Header Minimal -->
+  <header class="header-minimal">
+    <div class="logo">
+      NEXUSPAD <span style="font-size: 9px; opacity: 0.6;">v0.42</span>
+    </div>
+    <div class="status online" id="pcStatus">PC en ligne</div>
+    <div class="controls">
+      <button id="btnEditMode" class="p-2 rounded-lg bg-white/5 hover:bg-cyan-500/20 border border-white/10 text-slate-400 hover:text-cyan-400 transition-colors" title="Mode Édition">
+        <i class="fa-solid fa-cog text-sm"></i>
+      </button>
+      <button id="btnReorganizeMode" class="p-2 rounded-lg bg-white/5 hover:bg-purple-500/20 border border-white/10 text-slate-400 hover:text-purple-400 transition-colors" title="Mode Réorganisation">
+        <i class="fa-solid fa-arrows-up-down-left-right text-sm"></i>
+      </button>
+      <button id="btnSleep" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-cyan-400 transition-colors" title="Veille">
+        <i class="fa-solid fa-power-off text-sm"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Contenu Principal -->
+  <div class="app-content">
+    
+    <!-- Sidebar Compacte -->
+    <div class="sidebar">
+      <div id="profileList" class="flex flex-col gap-2">
+        <!-- Profils injectés par JS -->
+      </div>
+      
+      <div class="mt-auto flex flex-col gap-2">
+        <button id="btnConfig" class="p-2 rounded bg-white/5 border border-white/10 text-xs font-bold tracking-wider hover:bg-white/10 hover:border-cyan-500/50 hover:text-cyan-400 transition-all uppercase">
+          <i class="fa-solid fa-cog"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Zone Principale avec Grid -->
+    <div class="main">
+      
+      <!-- Grid Container -->
+      <div class="keys-grid" id="grid">
+        <!-- Boutons injectés par JS avec structure pro -->
+      </div>
+      
+      <!-- Overlays Modes -->
+      <div class="grid-overlay"></div>
+      <div class="mode-badge"></div>
+      <div class="overlay-hint"></div>
+      
+    </div>
+    
+  </div>
+
+</div>
+
+<!-- Modaux (conservées) -->
+<div id="sleepOverlay" class="fixed inset-0 bg-black z-[9999] hidden cursor-pointer"></div>
+
+<div id="configOverlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+  <div id="configModal" class="glass w-full max-w-lg p-5 transform scale-95 opacity-0 transition-all duration-200 max-h-full overflow-y-auto">
+    
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-lg font-bold text-slate-100">Configuration</h2>
+      <button id="closeConfig" class="p-1 text-slate-400 hover:text-slate-200">
+        <i class="fa-solid fa-times"></i>
+      </button>
+    </div>
+
+    <form id="configForm" class="flex flex-col gap-4">
+      <div class="grid grid-cols-4 gap-3 items-center">
+        <label class="text-[10px] text-slate-400 uppercase tracking-wider">Titre</label>
+        <input type="text" name="label" class="col-span-3 bg-white/5 border border-white/10 rounded px-3 py-2 text-sm text-slate-100 focus:border-cyan-400 outline-none transition-colors" placeholder="Ex: Photoshop">
+      </div>
+
+      <div class="grid grid-cols-4 gap-3 items-center">
+        <label class="text-[10px] text-slate-400 uppercase tracking-wider">Sous-titre</label>
+        <input type="text" name="hint" class="col-span-3 bg-white/5 border border-white/10 rounded px-3 py-2 text-sm text-slate-100 focus:border-cyan-400 outline-none transition-colors" placeholder="Ex: psd">
+      </div>
+
+      <div class="grid grid-cols-4 gap-3 items-center">
+        <label class="text-[10px] text-slate-400 uppercase tracking-wider">Image</label>
+        <div class="col-span-3 flex items-center gap-2">
+           <div id="imgPreview" class="w-9 h-9 rounded bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
+             <i class="fa-solid fa-image text-slate-500"></i>
+           </div>
+           <input type="file" id="imgInput" accept="image/*" class="hidden">
+           <button type="button" id="imgButton" class="text-[10px] px-2 py-1.5 border border-white/20 rounded text-slate-300 hover:bg-white/5 flex-1">Parcourir...</button>
+           <button type="button" id="imgClear" class="text-[10px] px-2 py-1.5 border border-red-500/30 text-red-400 rounded hover:bg-red-500/10 shrink-0">×</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-4 gap-3 items-center">
+        <label class="text-[10px] text-slate-400 uppercase tracking-wider">Action</label>
+        <div class="col-span-3 relative">
+          <select name="type" class="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-sm text-slate-100 appearance-none focus:border-cyan-400 outline-none transition-colors cursor-pointer">
+            <option value="keys">Raccourci Clavier</option>
+            <option value="run">Lancer Programme</option>
+            <option value="shell">Commande Shell</option>
+          </select>
+          <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-4 gap-3 items-start">
+        <label class="text-[10px] text-slate-400 uppercase tracking-wider mt-2.5">Commande</label>
+        <div class="col-span-3 payload-container">
+          <input type="text" name="payload" class="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-slate-100 font-mono text-sm focus:border-cyan-400 outline-none transition-colors" placeholder="CTRL+SHIFT+X">
+          <div class="payload-help text-[9px] text-slate-500 mt-1 hidden"></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-4 gap-3 items-center mt-1">
+        <label class="text-[10px] text-slate-400 uppercase tracking-wider">Couleur</label>
+        <div class="col-span-3 flex gap-3 flex-wrap">
+          <label class="cursor-pointer">
+            <input type="radio" name="accent" value="cyan" class="sr-only">
+            <div class="w-6 h-6 rounded-full bg-cyan-500 border-2 border-transparent ring-2 ring-transparent transition-all hover:scale-110 peer-checked:ring-cyan-400 peer-checked:ring-offset-2 peer-checked:ring-offset-slate-800"></div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="accent" value="purple" class="sr-only">
+            <div class="w-6 h-6 rounded-full bg-purple-500 border-2 border-transparent ring-2 ring-transparent transition-all hover:scale-110 peer-checked:ring-purple-400 peer-checked:ring-offset-2 peer-checked:ring-offset-slate-800"></div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="accent" value="red" class="sr-only">
+            <div class="w-6 h-6 rounded-full bg-red-500 border-2 border-transparent ring-2 ring-transparent transition-all hover:scale-110 peer-checked:ring-red-400 peer-checked:ring-offset-2 peer-checked:ring-offset-slate-800"></div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="accent" value="green" class="sr-only">
+            <div class="w-6 h-6 rounded-full bg-green-500 border-2 border-transparent ring-2 ring-transparent transition-all hover:scale-110 peer-checked:ring-green-400 peer-checked:ring-offset-2 peer-checked:ring-offset-slate-800"></div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="accent" value="orange" class="sr-only">
+            <div class="w-6 h-6 rounded-full bg-orange-500 border-2 border-transparent ring-2 ring-transparent transition-all hover:scale-110 peer-checked:ring-orange-400 peer-checked:ring-offset-2 peer-checked:ring-offset-slate-800"></div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="accent" value="white" class="sr-only">
+            <div class="w-6 h-6 rounded-full bg-slate-100 border-2 border-transparent ring-2 ring-transparent transition-all hover:scale-110 peer-checked:ring-slate-100 peer-checked:ring-offset-2 peer-checked:ring-offset-slate-800"></div>
+          </label>
+        </div>
+      </div>
+
+      <div class="flex gap-3 pt-3">
+        <button type="button" id="configCancel" class="flex-1 px-4 py-2 border border-white/20 rounded text-slate-300 hover:bg-white/5 transition-colors">Annuler</button>
+        <button type="submit" class="flex-1 px-4 py-2 bg-cyan-600 rounded text-white hover:bg-cyan-700 transition-colors">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="./js/app.js?v=0.42"></script>
+</body>
+</html>

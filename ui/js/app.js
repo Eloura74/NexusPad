@@ -35,8 +35,75 @@ const dbg = (...args) => { if (DEBUG) console.log("[UI]", ...args); };
 let cfg = null;
 let currentProfile = null;
 let editingButton = null; // { profileId, index }
-let isEditMode = false; // Default Locked - Mode Édition Paramètres
-let isReorganizeMode = false; // Mode Réorganisation Drag & Drop
+let isEditMode = false;
+let isReorganizeMode = false;
+
+function setMode(mode) {
+  // Nettoyer les modes précédents
+  document.body.classList.remove('mode-edit', 'mode-reorg');
+  isEditMode = false;
+  isReorganizeMode = false;
+  
+  // Appliquer le nouveau mode
+  if (mode === 'edit') {
+    isEditMode = true;
+    document.body.classList.add('mode-edit');
+    
+    // Désactiver draggable en mode édition
+    document.querySelectorAll('.wrap').forEach(wrap => {
+      wrap.draggable = false;
+    });
+    
+    toast("Mode ÉDITION activé - Cliquez sur une touche pour l'éditer", 3000);
+    
+  } else if (mode === 'reorg') {
+    isReorganizeMode = true;
+    document.body.classList.add('mode-reorg');
+    
+    // Activer draggable en mode réorganisation
+    document.querySelectorAll('.wrap').forEach(wrap => {
+      wrap.draggable = true;
+    });
+    
+    toast("Mode RÉORGANISATION activé - Glissez pour réorganiser", 3000);
+    
+  } else {
+    // Mode normal
+    document.querySelectorAll('.wrap').forEach(wrap => {
+      wrap.draggable = false;
+    });
+    
+    toast("Mode NORMAL - Actions directes", 2000);
+  }
+  
+  // Mettre à jour l'apparence des boutons mode
+  updateModeButtons();
+}
+
+function updateModeButtons() {
+  const btnEdit = document.getElementById('btnEditMode');
+  const btnReorg = document.getElementById('btnReorganizeMode');
+  
+  if (btnEdit) {
+    if (isEditMode) {
+      btnEdit.classList.add('bg-cyan-500/20', 'text-cyan-400', 'border-cyan-400/50');
+      btnEdit.classList.remove('text-slate-400');
+    } else {
+      btnEdit.classList.remove('bg-cyan-500/20', 'text-cyan-400', 'border-cyan-400/50');
+      btnEdit.classList.add('text-slate-400');
+    }
+  }
+  
+  if (btnReorg) {
+    if (isReorganizeMode) {
+      btnReorg.classList.add('bg-purple-500/20', 'text-purple-400', 'border-purple-400/50');
+      btnReorg.classList.remove('text-slate-400');
+    } else {
+      btnReorg.classList.remove('bg-purple-500/20', 'text-purple-400', 'border-purple-400/50');
+      btnReorg.classList.add('text-slate-400');
+    }
+  }
+}
 
 let ws = null;
 let wsReconnectTimer = null;
@@ -235,9 +302,13 @@ function renderButtons(profile) {
   let isDragging = false; // Local state for drag operation
 
   buttons.forEach((b, index) => {
-    // 1. Structure Compatible avec le CSS Hyper-Réaliste
+    // 1. Structure Pro avec Cellule Container
+    const cell = document.createElement("div");
+    cell.className = "key-cell";
+    cell.dataset.index = index;
+    
     const wrap = document.createElement("div");
-    wrap.className = "wrap"; // Changer vers .wrap pour compatibilité CSS
+    wrap.className = "wrap";
     wrap.dataset.index = index;
 
     // Hidden Input pour les états CSS (:checked, :hover, etc.)
@@ -304,30 +375,31 @@ function renderButtons(profile) {
     let clickTimeout = null;
     let hasStartedDrag = false;
     
-    // Handle Click Events - Utiliser l'input caché pour les états CSS
+    // Handle Click Events - Gestion Stricte des Modes
     input.addEventListener("click", (e) => {
-      e.preventDefault(); // Empêcher le comportement checkbox par défaut
+      e.preventDefault();
       
-      // Empêcher le clic si on vient de faire un drag
       if (hasStartedDrag) return;
       
-      // Visual Feedback via CSS states
       if (isEditMode) {
-        // Mode Édition : Ouvre l'éditeur
+        // Mode ÉDITION : Ouvre l'éditeur uniquement
         openEditor(profile.id, index);
-      } else if (isReorganizeMode) {
-        // Mode Réorganisation : Juste un feedback, le drag fait le travail
-        toast("Maintenez et glissez pour réorganiser", 1500);
-      } else {
-        // Mode Normal : Exécute l'action + état actif temporaire
-        input.checked = true; // Active le style CSS
-        executeAction(b);
-        
-        // Désactiver après animation
-        setTimeout(() => {
-          input.checked = false;
-        }, 300);
+        return;
       }
+      
+      if (isReorganizeMode) {
+        // Mode RÉORGANISATION : Aucune action, juste hint
+        toast("🤏 Glissez pour réorganiser cette touche", 1500);
+        return;
+      }
+      
+      // Mode NORMAL : Exécute l'action + feedback visuel
+      input.checked = true;
+      executeAction(b);
+      
+      setTimeout(() => {
+        input.checked = false;
+      }, 280);
     });
     
     // Plus besoin des event listeners mousedown/touchstart/mouseup/touchend
@@ -413,7 +485,8 @@ function renderButtons(profile) {
     // IMPORTANT : Définir draggable selon le mode ACTUEL
     wrap.draggable = isReorganizeMode;
 
-    elGrid.appendChild(wrap);
+    cell.appendChild(wrap);
+    elGrid.appendChild(cell);
 
   });
   
@@ -884,87 +957,64 @@ setInterval(() => {
   }
 }, 1000);
 
-/* ========= CONFIG BUTTON ========= */
-/* ========= CONFIG BUTTON ========= */
-/* ========= EDIT MODE SYSTEM ========= */
-function setupEditMode() {
-    const btnEditMode = document.getElementById("btnEditMode");
-    const btnReorganizeMode = document.getElementById("btnReorganizeMode");
-    
-    // Mode Édition (Paramètres)
-    if (btnEditMode) {
-        btnEditMode.addEventListener("click", () => {
-            // Désactiver mode réorganisation si actif
-            if (isReorganizeMode) {
-                isReorganizeMode = false;
-                const iconReorg = btnReorganizeMode.querySelector("i");
-                iconReorg.className = "fa-solid fa-arrows-up-down-left-right";
-                btnReorganizeMode.classList.remove("border-purple-500/50", "bg-purple-500/10");
-            }
-            
-            isEditMode = !isEditMode;
-            console.log("Edit mode toggled:", isEditMode);
-            
-            // Update Icon
-            const icon = btnEditMode.querySelector("i");
-            if (isEditMode) {
-                icon.className = "fa-solid fa-cog text-cyan-400";
-                btnEditMode.classList.add("border-cyan-500/50", "bg-cyan-500/10");
-                document.body.classList.add("edit-mode");
-                toast("Mode Édition ACTIVÉ - Clic pour paramétrer", 2000);
-            } else {
-                icon.className = "fa-solid fa-cog";
-                btnEditMode.classList.remove("border-cyan-500/50", "bg-cyan-500/10");
-                document.body.classList.remove("edit-mode");
-                toast("Mode Édition DÉSACTIVÉ", 1000);
-            }
-            
-            // Re-render to update click logic
-            if (currentProfile) renderButtons(currentProfile);
-        });
-    }
-    
-    // Mode Réorganisation (Drag & Drop)
-    if (btnReorganizeMode) {
-        btnReorganizeMode.addEventListener("click", () => {
-            // Désactiver mode édition si actif
-            if (isEditMode) {
-                isEditMode = false;
-                const iconEdit = btnEditMode.querySelector("i");
-                iconEdit.className = "fa-solid fa-cog";
-                btnEditMode.classList.remove("border-cyan-500/50", "bg-cyan-500/10");
-                document.body.classList.remove("edit-mode");
-            }
-            
-            isReorganizeMode = !isReorganizeMode;
-            console.log("Reorganize mode toggled:", isReorganizeMode);
-            
-            // Update Icon
-            const icon = btnReorganizeMode.querySelector("i");
-            if (isReorganizeMode) {
-                icon.className = "fa-solid fa-arrows-up-down-left-right text-purple-400";
-                btnReorganizeMode.classList.add("border-purple-500/50", "bg-purple-500/10");
-                document.body.classList.add("reorganize-mode");
-                toast("Mode Réorganisation ACTIVÉ - Glissez pour déplacer", 2000);
-            } else {
-                icon.className = "fa-solid fa-arrows-up-down-left-right";
-                btnReorganizeMode.classList.remove("border-purple-500/50", "bg-purple-500/10");
-                document.body.classList.remove("reorganize-mode");
-                toast("Mode Réorganisation DÉSACTIVÉ", 1000);
-            }
-            
-            // Re-render to update drag logic
-            if (currentProfile) renderButtons(currentProfile);
-        });
-    }
+/* ========= MODE BUTTONS PROFESSIONNELS ========= */
+function setupModeButtons() {
+  const btnEditMode = document.getElementById("btnEditMode");
+  const btnReorganizeMode = document.getElementById("btnReorganizeMode");
 
-    // Old Config Button (Top Right) - Open config overlay
-    if (btnConfig) {
-      btnConfig.addEventListener("click", () => {
-          // Toggle edit mode
-          if (btnEditMode) btnEditMode.click();
-      });
-    }
+  if (btnEditMode) {
+    btnEditMode.addEventListener("click", () => {
+      if (isEditMode) {
+        setMode('normal');
+      } else {
+        setMode('edit');
+        // Re-render pour appliquer draggable
+        const profile = getCurrentProfile();
+        renderButtons(profile);
+      }
+    });
+  }
+
+  if (btnReorganizeMode) {
+    btnReorganizeMode.addEventListener("click", () => {
+      if (isReorganizeMode) {
+        setMode('normal');
+      } else {
+        setMode('reorg');
+        // Re-render pour appliquer draggable
+        const profile = getCurrentProfile();
+        renderButtons(profile);
+      }
+    });
+  }
+}
+
+/* ========= CONFIG BUTTON ========= */
+function setupConfigButton() {
+  const btnConfig = document.getElementById("btnConfig");
+  
+  if (btnConfig) {
+    btnConfig.addEventListener("click", () => {
+      // Ouvrir la modale de configuration
+      const overlay = document.getElementById("configOverlay");
+      if (overlay) {
+        overlay.classList.remove("hidden");
+        const modal = document.getElementById("configModal");
+        if (modal) {
+          setTimeout(() => {
+            modal.classList.remove("scale-95", "opacity-0");
+          }, 50);
+        }
+      }
+    });
+  }
+}
+
+/* ========= INITIALIZATION ========= */
+function init() {
+  setupModeButtons();
+  setupConfigButton();
+  // ... autres initialisations
 }
 
 /* ========= SLEEP MODE ========= */
@@ -1178,7 +1228,7 @@ function stopAutoSync() {
 
 /* ========= AUTO-UPDATE DETECTION ========= */
 let updateCheckInterval = null;
-const CURRENT_VERSION = "0.38"; // Version actuelle
+const CURRENT_VERSION = "0.42"; // Version actuelle
 
 async function checkForUpdates() {
   // Détecter si c'est un écran tactile ou un PC normal

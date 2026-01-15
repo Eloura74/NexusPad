@@ -3,7 +3,7 @@
 
 .wrap {
   --radius: 30px;
-  --bg: #000000;
+  --bg: transparent; /* Supprime le noir autour */
 
   display: flex;
   align-items: center;
@@ -12,31 +12,16 @@
   position: relative;
   pointer-events: none;
   
-  /* Adaptation pour NexusPad Grid */
-  width: 120px;
-  height: 120px;
-  margin: 10px;
-}
-
-.wrap::before {
-  content: "";
-  position: absolute;
-  width: 350px;
-  height: 300px;
-  border-radius: 50px;
-  background-color: rgba(255, 255, 255, 0.05);
-  filter: blur(60px);
-  transform: skewY(-20deg);
-}
-
-.wrap::after {
-  content: "";
-  position: absolute;
+  /* Adaptation responsive et réaliste */
   width: 100%;
   height: 100%;
-  border-radius: 50px;
-  background-color: rgba(0, 0, 0, 0.5);
-  filter: blur(30px);
+  margin: 0; /* Plus de marge noire */
+}
+
+/* Suppression des halos externes */
+.wrap::before,
+.wrap::after {
+  display: none; /* Plus de halo externe */
 }
 
 .wrap input {
@@ -54,16 +39,21 @@
 .button {
   position: relative;
   overflow: hidden;
-  width: 100px;  /* Adapté pour NexusPad */
-  height: 100px; /* Adapté pour NexusPad */
-  background-color: var(--bg);
+  width: 100%;  /* Utilise toute la cellule */
+  height: 100%; /* Utilise toute la cellule */
+  max-width: 120px; /* Taille max pour Pad7 */
+  max-height: 120px;
+  background: 
+    radial-gradient(circle at center, rgba(255, 115, 0, 0.1) 0%, transparent 70%),
+    #2a2a2a; /* Halo interne + base sombre */
   z-index: 2;
   border: transparent;
   border-radius: var(--radius);
   box-shadow:
     inset 0 1px 1px rgb(255 255 255 / 40%),
     inset 0 -6px 1px -4px #ff7300,
-    inset 0 -15px 6px -8px #ff6600;
+    inset 0 -15px 6px -8px #ff6600,
+    0 0 20px rgba(255, 115, 0, 0.2); /* Halo réduit */
   transition: all 0.3s ease;
 }
 
@@ -162,14 +152,15 @@
 }
 
 .bg {
-  background-color: black;
+  background: transparent; /* Plus de background noir */
   position: absolute;
-  inset: -5px; /* Réduit pour NexusPad */
-  border-radius: calc(var(--radius) * 1.25);
-  box-shadow: 0 15px 8px -8px rgba(0, 0, 0, 0.3); /* Réduit pour NexusPad */
+  inset: -2px;
+  border-radius: calc(var(--radius) * 1.1);
   transition: all 0.3s ease;
   overflow: hidden;
   z-index: 1;
+  /* Halo de base subtle */
+  box-shadow: 0 8px 16px rgba(255, 115, 0, 0.15);
 }
 
 .bg::before {
@@ -190,17 +181,26 @@
   position: absolute;
   z-index: 0;
   transition: all 0.3s ease;
-  background: rgb(255, 115, 0);
-  width: 8px;   /* Réduit pour NexusPad */
-  height: 8px;  /* Réduit pour NexusPad */
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
+  background: radial-gradient(circle, #ff7300 0%, #ff3300 100%);
+  width: 12px;
+  height: 12px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0);
   border-radius: 50%;
-  filter: blur(2px);
-  transform: translateY(0) scale(0);
-  animation: bg 2.4s linear 0.3s;
+  filter: blur(3px);
+  animation: bgShine 2.8s ease-in-out infinite;
+}
+
+@keyframes bgShine {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(8);
+    opacity: 0.8;
+  }
 }
 
 .bg .shine-2::before {

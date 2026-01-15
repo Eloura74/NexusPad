@@ -1,0 +1,322 @@
+/* ========= LAYOUT PRO - ZERO SCROLL 1024x600 ========= */
+
+/* 1) Anti-scroll STRICT global */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  max-height: 100vh;
+  max-width: 100vw;
+}
+
+/* Force tout élément à ne pas déborder */
+* {
+  box-sizing: border-box;
+}
+
+*::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* 2) App root avec background animé */
+#app {
+  height: 100dvh;
+  max-height: 100vh;
+  display: grid;
+  grid-template-rows: 36px minmax(0, 1fr); /* Header ultra-compact pour Pad7 */
+  overflow: hidden;
+  background: 
+    radial-gradient(circle at 30% 70%, rgba(255, 165, 0, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 70% 30%, rgba(0, 204, 255, 0.08) 0%, transparent 60%),
+    url('../images/bg-main.jpg');
+  background-size: cover, cover, cover;
+  background-position: center, center, center;
+  background-attachment: fixed;
+  animation: bgShift 30s ease-in-out infinite alternate;
+}
+
+@keyframes bgShift {
+  0% {
+    background-position: 
+      center, 
+      center, 
+      50% 50%;
+  }
+  100% {
+    background-position: 
+      55% 45%, 
+      45% 55%, 
+      52% 48%;
+  }
+}
+
+/* 3) Zone contenu : sidebar + main */
+.app-content {
+  min-height: 0; /* CRUCIAL pour éviter overflow */
+  max-height: 100%;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr); /* sidebar ultra-fine pour Pad7 */
+  overflow: hidden;
+}
+
+/* 4) Sidebar ultra-compacte */
+.sidebar {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* Gap réduit */
+  padding: 4px 2px; /* Padding minimal */
+  background: rgba(5, 7, 11, 0.02); /* Quasi-invisible */
+  backdrop-filter: none;
+  border-right: none; /* Supprime bordure */
+}
+
+/* 5) Main zone quasi-invisible */
+.main {
+  min-height: 0;
+  padding: 2px; /* Padding minimal */
+  position: relative;
+  background: rgba(5, 7, 11, 0.01); /* Quasi-transparent */
+  backdrop-filter: none;
+}
+
+/* 6) Grid : layout 4×3 pour Pad7 optimal */
+.keys-grid {
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)); /* Retour à 4x3 pour mieux rentrer */
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: 4px; /* Gap minimal */
+  place-content: stretch; /* Utilise tout l'espace */
+  padding: 2px;
+  overflow: hidden;
+}
+
+/* 7) Cellule de grid */
+.key-cell {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* 8) Bouton responsive dans sa cellule */
+.key-cell .wrap {
+  width: min(100%, 150px);
+  height: min(100%, 150px);
+  aspect-ratio: 1/1;
+  margin: 0; /* Supprime margin fixe */
+}
+
+/* ========= MODES UX PROFESSIONNELS ========= */
+
+/* 9) Overlay modes */
+.grid-overlay {
+  position: absolute;
+  inset: 12px;
+  background: rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(2px);
+  border-radius: 16px;
+  display: none;
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mode-edit .grid-overlay,
+.mode-reorg .grid-overlay {
+  display: block;
+}
+
+/* 10) Badge mode en haut à droite */
+.mode-badge {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  display: none;
+  z-index: 100;
+}
+
+.mode-edit .mode-badge {
+  display: block;
+  background: rgba(6, 182, 212, 0.2);
+  border-color: rgba(6, 182, 212, 0.4);
+  color: #06b6d4;
+}
+
+.mode-edit .mode-badge::before {
+  content: "✏️ ÉDITION";
+}
+
+.mode-reorg .mode-badge {
+  display: block;
+  background: rgba(168, 85, 247, 0.2);
+  border-color: rgba(168, 85, 247, 0.4);
+  color: #a855f7;
+}
+
+.mode-reorg .mode-badge::before {
+  content: "↕️ RÉORG";
+}
+
+/* 11) Hint overlay */
+.overlay-hint {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  display: none;
+  backdrop-filter: blur(4px);
+}
+
+.mode-edit .overlay-hint {
+  display: block;
+}
+
+.mode-edit .overlay-hint::before {
+  content: "👆 Cliquez sur une touche pour l'éditer";
+}
+
+.mode-reorg .overlay-hint {
+  display: block;
+}
+
+.mode-reorg .overlay-hint::before {
+  content: "🤏 Glissez pour réorganiser les touches";
+}
+
+/* 12) Curseurs selon le mode */
+.mode-edit .keys-grid {
+  cursor: pointer;
+}
+
+.mode-reorg .keys-grid {
+  cursor: grab;
+}
+
+.mode-reorg .keys-grid .wrap {
+  cursor: grab;
+}
+
+.mode-reorg .keys-grid .wrap:active {
+  cursor: grabbing;
+}
+
+/* ========= RESPONSIVE POUR ÉCRANS PLUS PETITS ========= */
+
+@media (max-width: 1200px) {
+  .keys-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 800px) {
+  .keys-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(5, minmax(0, 1fr));
+  }
+  
+  .app-content {
+    grid-template-columns: 60px minmax(0, 1fr);
+  }
+}
+
+@media (max-height: 600px) {
+  #app {
+    grid-template-rows: 40px minmax(0, 1fr); /* Header encore plus compact */
+  }
+  
+  .header-minimal {
+    min-height: 40px;
+    height: 40px;
+    max-height: 40px;
+    padding: 0 8px;
+  }
+  
+  .keys-grid {
+    gap: 4px; /* Gap minimal */
+    padding: 4px;
+  }
+  
+  .main {
+    padding: 4px;
+  }
+  
+  .sidebar {
+    padding: 4px 3px;
+  }
+  
+  .app-content {
+    grid-template-columns: 56px minmax(0, 1fr); /* Sidebar ultra-fine */
+  }
+}
+
+/* ========= HEADER MINIMAL ========= */
+.header-minimal {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  padding: 0 8px;
+  background: rgba(5, 7, 11, 0.02); /* Quasi-invisible */
+  backdrop-filter: blur(1px);
+  border-bottom: none; /* Supprime bordure pour plus d'espace */
+  min-height: 36px;
+  height: 36px;
+  max-height: 36px;
+}
+
+.header-minimal .logo {
+  font-size: 11px; /* Plus petit */
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.3px;
+}
+
+.header-minimal .controls {
+  display: flex;
+  gap: 4px; /* Espacement réduit */
+  align-items: center;
+}
+
+.header-minimal .controls button {
+  padding: 4px 6px !important; /* Boutons plus compacts */
+  font-size: 10px;
+}
+
+.header-minimal .status {
+  font-size: 8px; /* Plus petit */
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.header-minimal .status.online::before {
+  content: "●";
+  color: #22c55e;
+}
+
+.header-minimal .status.offline::before {
+  content: "●";
+  color: #ef4444;
+}

@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="fr"> 
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>NexusPad Realistic Test</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./css/layout-pro.css?v=0.40" />
+  <link rel="stylesheet" href="./css/realistic-buttons.css?v=0.40" />
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+<div id="app">
+  
+  <!-- Header Minimal -->
+  <header class="header-minimal">
+    <div class="logo">
+      NEXUSPAD <span style="font-size: 9px; opacity: 0.7;">REALISTIC v0.40</span>
+    </div>
+    <div class="status online" id="pcStatus">Test Mode</div>
+    <div class="controls">
+      <button class="p-2 rounded-lg bg-white/10 hover:bg-cyan-500/30 border border-white/20 text-cyan-400 transition-colors">
+        <i class="fa-solid fa-cog text-sm"></i>
+      </button>
+      <button class="p-2 rounded-lg bg-white/10 hover:bg-purple-500/30 border border-white/20 text-purple-400 transition-colors">
+        <i class="fa-solid fa-arrows-up-down-left-right text-sm"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Contenu Principal -->
+  <div class="app-content">
+    
+    <!-- Sidebar Test -->
+    <div class="sidebar">
+      <div class="flex flex-col gap-2">
+        <div class="w-8 h-8 rounded bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 text-xs">
+          1
+        </div>
+        <div class="w-8 h-8 rounded bg-white/10 border border-white/20 flex items-center justify-center text-white/60 text-xs">
+          2
+        </div>
+        <div class="w-8 h-8 rounded bg-white/10 border border-white/20 flex items-center justify-center text-white/60 text-xs">
+          3
+        </div>
+      </div>
+    </div>
+
+    <!-- Zone Principale avec Test Buttons -->
+    <div class="main">
+      
+      <!-- Grid Container -->
+      <div class="keys-grid">
+        
+        <!-- Test Button 1 -->
+        <div class="key-cell">
+          <div class="wrap">
+            <input type="checkbox" />
+            <div class="button" data-accent="cyan">
+              <div class="corner"></div>
+              <div class="inner">
+                <i class="fa-solid fa-copy"></i>
+                <div class="key-label">Copier</div>
+              </div>
+            </div>
+            <div class="led"></div>
+            <div class="bg">
+              <div class="shine-1"></div>
+              <div class="shine-2"></div>
+            </div>
+            <div class="bg-glow"></div>
+          </div>
+        </div>
+
+        <!-- Test Button 2 -->
+        <div class="key-cell">
+          <div class="wrap">
+            <input type="checkbox" />
+            <div class="button" data-accent="purple">
+              <div class="corner"></div>
+              <div class="inner">
+                <i class="fa-solid fa-paste"></i>
+                <div class="key-label">Coller</div>
+              </div>
+            </div>
+            <div class="led"></div>
+            <div class="bg">
+              <div class="shine-1"></div>
+              <div class="shine-2"></div>
+            </div>
+            <div class="bg-glow"></div>
+          </div>
+        </div>
+
+        <!-- Test Button 3 -->
+        <div class="key-cell">
+          <div class="wrap">
+            <input type="checkbox" />
+            <div class="button" data-accent="red">
+              <div class="corner"></div>
+              <div class="inner">
+                <i class="fa-solid fa-save"></i>
+                <div class="key-label">Sauver</div>
+              </div>
+            </div>
+            <div class="led"></div>
+            <div class="bg">
+              <div class="shine-1"></div>
+              <div class="shine-2"></div>
+            </div>
+            <div class="bg-glow"></div>
+          </div>
+        </div>
+
+        <!-- Test Button 4 -->
+        <div class="key-cell">
+          <div class="wrap">
+            <input type="checkbox" />
+            <div class="button" data-accent="green">
+              <div class="corner"></div>
+              <div class="inner">
+                <i class="fa-solid fa-search"></i>
+                <div class="key-label">Search</div>
+              </div>
+            </div>
+            <div class="led"></div>
+            <div class="bg">
+              <div class="shine-1"></div>
+              <div class="shine-2"></div>
+            </div>
+            <div class="bg-glow"></div>
+          </div>
+        </div>
+
+        <!-- Test Button 5 -->
+        <div class="key-cell">
+          <div class="wrap">
+            <input type="checkbox" />
+            <div class="button" data-accent="orange">
+              <div class="corner"></div>
+              <div class="inner">
+                <i class="fa-solid fa-camera"></i>
+                <div class="key-label">Capture</div>
+              </div>
+            </div>
+            <div class="led"></div>
+            <div class="bg">
+              <div class="shine-1"></div>
+              <div class="shine-2"></div>
+            </div>
+            <div class="bg-glow"></div>
+          </div>
+        </div>
+
+        <!-- Repeat pour remplir le 5x3 grid -->
+        <!-- Row 2 -->
+        <div class="key-cell">
+          <div class="wrap">
+            <input type="checkbox" />
+            <div class="button" data-accent="white">
+              <div class="corner"></div>
+              <div class="inner">
+                <i class="fa-solid fa-undo"></i>
+                <div class="key-label">Annuler</div>
+              </div>
+            </div>
+            <div class="led"></div>
+            <div class="bg"><div class="shine-1"></div><div class="shine-2"></div></div>
+            <div class="bg-glow"></div>
+          </div>
+        </div>
+        <div class="key-cell">
+          <div class="wrap">
+            <input type="checkbox" />
+            <div class="button" data-accent="cyan">
+              <div class="corner"></div>
+              <div class="inner">
+                <i class="fa-solid fa-redo"></i>
+                <div class="key-label">Rétablir</div>
+              </div>
+            </div>
+            <div class="led"></div>
+            <div class="bg"><div class="shine-1"></div><div class="shine-2"></div></div>
+            <div class="bg-glow"></div>
+          </div>
+        </div>
+        
+        <!-- Continue filling... -->
+        <div class="key-cell"><div class="wrap"><input type="checkbox" /><div class="button"><div class="corner"></div><div class="inner"><i class="fa-solid fa-cube"></i><div class="key-label">Test 8</div></div></div><div class="led"></div><div class="bg"><div class="shine-1"></div><div class="shine-2"></div></div><div class="bg-glow"></div></div></div>
+        <div class="key-cell"><div class="wrap"><input type="checkbox" /><div class="button"><div class="corner"></div><div class="inner"><i class="fa-solid fa-cube"></i><div class="key-label">Test 9</div></div></div><div class="led"></div><div class="bg"><div class="shine-1"></div><div class="shine-2"></div></div><div class="bg-glow"></div></div></div>
+        <div class="key-cell"><div class="wrap"><input type="checkbox" /><div class="button"><div class="corner"></div><div class="inner"><i class="fa-solid fa-cube"></i><div class="key-label">Test 10</div></div></div><div class="led"></div><div class="bg"><div class="shine-1"></div><div class="shine-2"></div></div><div class="bg-glow"></div></div></div>
+
+        <!-- Row 3 -->
+        <div class="key-cell"><div class="wrap"><input type="checkbox" /><div class="button"><div class="corner"></div><div class="inner"><i class="fa-solid fa-cube"></i><div class="key-label">Test 11</div></div></div><div class="led"></div><div class="bg"><div class="shine-1"></div><div class="shine-2"></div></div><div class="bg-glow"></div></div></div>
+        <div class="key-cell"><div class="wrap"><input type="checkbox" /><div class="button"><div class="corner"></div><div class="inner"><i class="fa-solid fa-cube"></i><div class="key-label">Test 12</div></div></div><div class="led"></div><div class="bg"><div class="shine-1"></div><div class="shine-2"></div></div><div class="bg-glow"></div></div></div>
+        <div class="key-cell"><div class="wrap"><input type="checkbox" /><div class="button"><div class="corner"></div><div class="inner"><i class="fa-solid fa-cube"></i><div class="key-label">Test 13</div></div></div><div class="led"></div><div class="bg"><div class="shine-1"></div><div class="shine-2"></div></div><div class="bg-glow"></div></div></div>
+        <div class="key-cell"><div class="wrap"><input type="checkbox" /><div class="button"><div class="corner"></div><div class="inner"><i class="fa-solid fa-cube"></i><div class="key-label">Test 14</div></div></div><div class="led"></div><div class="bg"><div class="shine-1"></div><div class="shine-2"></div></div><div class="bg-glow"></div></div></div>
+        <div class="key-cell"><div class="wrap"><input type="checkbox" /><div class="button"><div class="corner"></div><div class="inner"><i class="fa-solid fa-cube"></i><div class="key-label">Test 15</div></div></div><div class="led"></div><div class="bg"><div class="shine-1"></div><div class="shine-2"></div></div><div class="bg-glow"></div></div></div>
+        
+      </div>
+      
+    </div>
+    
+  </div>
+
+</div>
+
+<script>
+// Test interaction
+document.querySelectorAll('.wrap input').forEach(input => {
+  input.addEventListener('click', (e) => {
+    e.preventDefault();
+    input.checked = true;
+    setTimeout(() => {
+      input.checked = false;
+    }, 300);
+  });
+});
+</script>
+
+</body>
+</html>
