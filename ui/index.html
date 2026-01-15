@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="fr"> 
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>NexusPad</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="stylesheet" href="./css/theme.css?v=0.23" />
+  <link rel="stylesheet" href="./css/cube.css?v=0.23" />
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-[#05070b] text-slate-100 overflow-hidden select-none h-screen w-full flex flex-col font-sans">
+
+  <!-- Overlay removed to show background image -->
+
+  <div class="relative z-10 flex flex-col w-full h-full max-w-full overflow-hidden">
+    
+    <div id="sleepOverlay" class="fixed inset-0 bg-black z-[9999] hidden cursor-pointer"></div>
+
+    <header class="glass mx-3 mt-3 p-3 flex items-center justify-between shrink-0">
+      <div class="flex items-center gap-3">
+        <div id="pcStatusDot" class="w-2.5 h-2.5 rounded-full dot-off shadow-[0_0_8px_currentColor]"></div>
+        <h1 class="text-lg font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500" style="font-family: 'Orbitron', sans-serif;">
+          NEXUSPAD <span class="text-[10px] text-slate-500 font-mono ml-1 align-top">v0.23</span>
+        </h1>
+      </div>
+      
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:flex text-[10px] font-mono text-slate-500 items-center gap-2">
+          <span id="pcStatusText">PC offline</span>
+        </div>
+        
+        <button id="btnSleep" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-cyan-400 transition-colors" title="Éteindre l'écran">
+          <i class="fa-solid fa-power-off"></i>
+        </button>
+
+        <button id="btnConfig" class="px-3 py-1.5 rounded bg-white/5 border border-white/10 text-[10px] font-bold tracking-wider hover:bg-white/10 hover:border-cyan-500/50 hover:text-cyan-400 transition-all uppercase">
+          CONFIG
+        </button>
+      </div>
+    </header>
+
+    <main class="flex-1 p-4 overflow-hidden flex gap-4 min-h-0">
+      
+      <!-- Compact Sidebar -->
+      <aside class="w-20 flex flex-col gap-3 shrink-0">
+        <div class="glass flex-1 flex flex-col items-center py-4 gap-4">
+          <!-- Mode / Status Icon -->
+          <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.2)]" title="Mode Studio">
+             <i class="fa-solid fa-layer-group text-lg"></i>
+          </div> 
+          
+          <div class="w-8 h-px bg-white/10"></div>
+
+          <!-- Vertical Profile List -->
+          <div id="profileList" class="flex flex-col gap-3 w-full px-2 overflow-y-auto no-scrollbar items-center">
+             <!-- Profiles injected here -->
+          </div>
+          
+          <div class="mt-auto w-8 h-px bg-white/10"></div>
+
+          <!-- Edit Mode Toggle -->
+          <button id="btnEditMode" class="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-slate-400 transition-all" title="Verrouiller / Déverrouiller">
+            <i class="fa-solid fa-lock"></i>
+          </button>
+          
+          <!-- Info / CPU (Minimal) -->
+          <div class="text-[9px] font-mono text-slate-600 text-center leading-tight">
+            <div>CPU</div>
+            <div class="text-slate-400">--%</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Expanded Grid -->
+      <section class="flex-1 glass p-5 relative flex flex-col min-w-0">
+        <div class="flex justify-between items-center mb-1 shrink-0 h-6">
+          <div class="text-[10px] text-slate-500 font-bold tracking-wider uppercase opacity-50">Stream Deck Layout</div>
+        </div>
+      <!-- Grid Container -->
+      <div id="grid" class="flex-1 grid gap-4 p-4 overflow-y-auto no-scrollbar content-start justify-center" 
+           style="grid-template-columns: repeat(auto-fit, 120px); grid-auto-rows: 120px;">
+        <!-- Buttons injected by JS -->
+      </div></section>
+
+    </main>
+
+  </div>
+
+  <div id="configOverlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+    <div id="configModal" class="glass w-full max-w-lg p-5 transform scale-95 opacity-0 transition-all duration-200 max-h-full overflow-y-auto">
+      
+      <div class="flex justify-between items-center mb-5">
+        <h2 class="text-lg font-bold text-white flex items-center gap-3">
+          <div class="w-1 h-5 bg-cyan-400 rounded-full shadow-[0_0_10px_rgba(34,211,238,0.8)]"></div>
+          ÉDITER LA TOUCHE
+        </h2>
+        <button id="btnCancel" type="button" class="text-slate-400 hover:text-white transition-colors p-2">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="configForm" class="flex flex-col gap-4">
+        <div class="grid grid-cols-4 gap-3 items-center">
+          <label class="text-[10px] text-slate-400 uppercase tracking-wider">Titre</label>
+          <input type="text" name="label" class="col-span-3 bg-white/5 border border-white/10 rounded px-3 py-2 text-sm text-slate-100 focus:border-cyan-400 outline-none transition-colors" placeholder="Ex: Photoshop">
+        </div>
+
+        <div class="grid grid-cols-4 gap-3 items-center">
+          <label class="text-[10px] text-slate-400 uppercase tracking-wider">Sous-titre</label>
+          <input type="text" name="hint" class="col-span-3 bg-white/5 border border-white/10 rounded px-3 py-2 text-sm text-slate-100 focus:border-cyan-400 outline-none transition-colors" placeholder="Ex: psd">
+        </div>
+
+        <div class="grid grid-cols-4 gap-3 items-center">
+          <label class="text-[10px] text-slate-400 uppercase tracking-wider">Image</label>
+          <div class="col-span-3 flex items-center gap-2">
+             <div id="imgPreview" class="w-9 h-9 rounded bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
+               <i class="fa-solid fa-image text-slate-500 text-xs"></i>
+             </div>
+             <button type="button" id="btnUpload" class="px-3 py-1.5 rounded bg-white/10 hover:bg-white/20 text-[10px] uppercase tracking-wider text-slate-300 whitespace-nowrap">
+               Choisir
+             </button>
+             <button type="button" id="btnClearImg" class="px-3 py-1.5 rounded bg-white/10 hover:bg-red-500/20 hover:text-red-400 text-[10px] uppercase tracking-wider text-slate-300" title="Supprimer l'image">
+               <i class="fa-solid fa-trash"></i>
+             </button>
+             <input type="file" id="fileInput" accept="image/*" class="hidden">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-4 gap-3 items-center">
+          <label class="text-[10px] text-slate-400 uppercase tracking-wider">Action</label>
+          <div class="col-span-3 relative">
+            <select name="type" class="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-sm text-slate-100 appearance-none focus:border-cyan-400 outline-none transition-colors cursor-pointer">
+              <option value="keys">Raccourci Clavier</option>
+              <option value="run">Lancer Programme</option>
+              <option value="shell">Commande Shell</option>
+            </select>
+            <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+              <i class="fa-solid fa-chevron-down text-[10px]"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-4 gap-3 items-start">
+          <label class="text-[10px] text-slate-400 uppercase tracking-wider mt-2.5">Commande</label>
+          <div class="col-span-3 payload-container">
+            <input type="text" name="payload" class="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-slate-100 font-mono text-sm focus:border-cyan-400 outline-none transition-colors" placeholder="CTRL+SHIFT+X">
+            <div class="text-[9px] text-slate-500 mt-1 italic">Pour les programmes, utilisez le chemin complet (ex: C:\Windows\System32\calc.exe)</div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-4 gap-3 items-center mt-1">
+          <label class="text-[10px] text-slate-400 uppercase tracking-wider">Couleur</label>
+          <div class="col-span-3 flex gap-3 flex-wrap">
+            <label class="cursor-pointer">
+              <input type="radio" name="accent" value="cyan" class="peer hidden" checked>
+              <div class="w-6 h-6 rounded-full bg-cyan-500/20 border border-cyan-500/50 peer-checked:bg-cyan-400 peer-checked:shadow-[0_0_12px_rgba(34,211,238,0.6)] transition-all"></div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="accent" value="purple" class="peer hidden">
+              <div class="w-6 h-6 rounded-full bg-purple-500/20 border border-purple-500/50 peer-checked:bg-purple-400 peer-checked:shadow-[0_0_12px_rgba(192,132,252,0.6)] transition-all"></div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="accent" value="red" class="peer hidden">
+              <div class="w-6 h-6 rounded-full bg-red-500/20 border border-red-500/50 peer-checked:bg-red-400 peer-checked:shadow-[0_0_12px_rgba(248,113,113,0.6)] transition-all"></div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="accent" value="green" class="peer hidden">
+              <div class="w-6 h-6 rounded-full bg-green-500/20 border border-green-500/50 peer-checked:bg-green-400 peer-checked:shadow-[0_0_12px_rgba(74,222,128,0.6)] transition-all"></div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="accent" value="orange" class="peer hidden">
+              <div class="w-6 h-6 rounded-full bg-orange-500/20 border border-orange-500/50 peer-checked:bg-orange-400 peer-checked:shadow-[0_0_12px_rgba(251,146,60,0.6)] transition-all"></div>
+            </label>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
+          <button type="button" id="btnDelete" class="text-red-400 hover:text-red-300 text-xs px-3 py-2 hover:bg-red-500/10 rounded transition-colors uppercase tracking-wider">
+            Supprimer
+          </button>
+          <div class="flex gap-3">
+             <button type="submit" class="px-5 py-2 rounded bg-cyan-500 hover:bg-cyan-400 text-black text-sm font-semibold shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transition-all">
+              Sauvegarder
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800/90 border border-white/10 text-white px-4 py-2 rounded-xl text-sm shadow-xl hidden z-[200]">
+  </div>
+
+  <div class="noise"></div>
+  <script src="./js/app.js?v=0.23"></script>
+</body>
+</html>

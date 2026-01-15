@@ -1,0 +1,18 @@
+# OS / Editor
+.DS_Store
+*.log
+*.tmp
+.vscode/
+.idea/
+
+# Node / build (si jamais)
+node_modules/
+dist/
+build/
+
+# Cache
+.cache/
+
+# Secrets (si ajoutés plus tard)
+.env
+.env.local

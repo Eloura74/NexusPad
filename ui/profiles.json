@@ -1,0 +1,52 @@
+{
+  "defaults": {
+    "agentBaseUrl": "http://192.168.1.50:8787",
+    "token": "CHANGE_ME_TOKEN",
+    "pollHealthMs": 3000
+  },
+  "profiles": [
+    {
+      "id": "DEFAULT",
+      "label": "DEFAULT",
+      "grid": { "cols": 4 },
+      "buttons": [
+        { "label": "TaskMgr", "hint": "Ctrl+Shift+Esc", "accent": "cyan", "action": { "type": "keys", "payload": "CTRL+SHIFT+ESC" } },
+        { "label": "Explorer", "hint": "Win+E", "accent": "blue", "action": { "type": "keys", "payload": "WIN+E" } },
+        { "label": "Terminal", "hint": "Win+T", "accent": "purple", "action": { "type": "keys", "payload": "WIN+T" } },
+        { "label": "Lock", "hint": "Win+L", "accent": "red", "action": { "type": "keys", "payload": "WIN+L" } },
+        { "label": "Calculator", "hint": "Win+R calc", "accent": "green", "action": { "type": "keys", "payload": "WIN+R" } },
+        { "label": "Notepad", "hint": "Win+R notepad", "accent": "orange", "action": { "type": "keys", "payload": "WIN+R" } },
+        { "label": "Control", "hint": "Win+R control", "accent": "white", "action": { "type": "keys", "payload": "WIN+R" } },
+        { "label": "AUTO-RELOAD", "hint": "Test v0.22 OK", "accent": "cyan", "action": { "type": "keys", "payload": "WIN+R" } }
+      ]
+    },
+    {
+      "id": "STUDIO",
+      "label": "STUDIO",
+      "grid": { "cols": 4 },
+      "buttons": [
+        { "label": "OBS", "hint": "Launch", "accent": "green", "action": { "type": "run", "payload": "obs64.exe" } },
+        { "label": "Rec", "hint": "Start/Stop", "accent": "red", "action": { "type": "keys", "payload": "F10" } },
+        { "label": "Mic", "hint": "Mute", "accent": "orange", "action": { "type": "keys", "payload": "F11" } },
+        { "label": "Scene 1", "hint": "Main", "accent": "cyan", "action": { "type": "keys", "payload": "F1" } },
+        { "label": "Scene 2", "hint": "Gaming", "accent": "purple", "action": { "type": "keys", "payload": "F2" } },
+        { "label": "Scene 3", "hint": "Chat", "accent": "blue", "action": { "type": "keys", "payload": "F3" } },
+        { "label": "Transition", "hint": "Cut", "accent": "white", "action": { "type": "keys", "payload": "F12" } }
+      ]
+    },
+    {
+      "id": "GAMING",
+      "label": "GAMING",
+      "grid": { "cols": 4 },
+      "buttons": [
+        { "label": "Steam", "hint": "Launch", "accent": "blue", "action": { "type": "run", "payload": "steam.exe" } },
+        { "label": "Discord", "hint": "Launch", "accent": "purple", "action": { "type": "run", "payload": "discord.exe" } },
+        { "label": "ShadowPlay", "hint": "Save 5m", "accent": "green", "action": { "type": "keys", "payload": "ALT+F10" } },
+        { "label": "Screenshot", "hint": "Win+PrtSc", "accent": "white", "action": { "type": "keys", "payload": "WIN+PRTSC" } },
+        { "label": "Twitch", "hint": "Launch", "accent": "cyan", "action": { "type": "run", "payload": "chrome.exe --app=https://twitch.tv" } },
+        { "label": "YouTube", "hint": "Launch", "accent": "red", "action": { "type": "run", "payload": "chrome.exe --app=https://youtube.com" } },
+        { "label": "Game Mode", "hint": "Win+G", "accent": "orange", "action": { "type": "keys", "payload": "WIN+G" } }
+      ]
+    }
+  ]
+}

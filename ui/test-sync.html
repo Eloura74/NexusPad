@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Sync MacroPad</title>
+    <style>
+        body { font-family: monospace; background: #111; color: #0ff; padding: 20px; }
+        .log { background: #000; padding: 10px; border: 1px solid #333; max-height: 400px; overflow-y: auto; }
+        button { background: #0ff; color: #000; border: none; padding: 10px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>🔄 Test de Synchronisation MacroPad</h2>
+    
+    <button onclick="testSync()">Test Sync</button>
+    <button onclick="clearLog()">Clear</button>
+    
+    <div id="log" class="log"></div>
+    
+    <script>
+        let logDiv = document.getElementById('log');
+        
+        function log(msg) {
+            logDiv.innerHTML += '[' + new Date().toLocaleTimeString() + '] ' + msg + '<br>';
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function clearLog() {
+            logDiv.innerHTML = '';
+        }
+        
+        async function testSync() {
+            log('🚀 Début du test de synchronisation...');
+            
+            const urls = [
+                './profiles.json?t=' + Date.now(),
+                'http://192.168.1.86:8091/profiles.json?t=' + Date.now(),
+                'http://macropad.lan/profiles.json?t=' + Date.now()
+            ];
+            
+            for (let url of urls) {
+                try {
+                    log(`📡 Test: ${url}`);
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        cache: 'no-cache',
+                        headers: {
+                            'Cache-Control': 'no-cache, no-store, must-revalidate',
+                            'Pragma': 'no-cache'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        log(`✅ Succès: ${data.profiles.length} profils trouvés`);
+                        log(`   Profils: ${data.profiles.map(p => p.id).join(', ')}`);
+                    } else {
+                        log(`❌ Erreur ${response.status}: ${response.statusText}`);
+                    }
+                } catch (error) {
+                    log(`💥 Exception: ${error.message}`);
+                }
+            }
+            
+            log('🏁 Test terminé');
+        }
+        
+        // Auto-start
+        setTimeout(testSync, 1000);
+    </script>
+</body>
+</html>
