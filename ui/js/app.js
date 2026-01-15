@@ -254,13 +254,13 @@ function renderButtons(profile) {
     const inner = document.createElement("div");
     inner.className = "inner";
     
-    // Icon Logic
+    // Icon Logic - Support des icônes personnalisées
     const iconClass = b.icon || getIcon(b.label || "");
     let innerContent = "";
     if (b.image) {
        innerContent += `<div class="key-bg" style="background-image: url('${b.image}')"></div>`;
     }
-    // We use FontAwesome instead of the complex SVG for now, adapted to the style
+    // Support des icônes FontAwesome personnalisées
     innerContent += `<i class="key-icon fa-solid ${iconClass}"></i>`;
     if (b.label) {
       innerContent += `<div class="key-label">${escapeHtml(b.label)}</div>`;
@@ -1160,7 +1160,7 @@ function stopAutoSync() {
 
 /* ========= AUTO-UPDATE DETECTION ========= */
 let updateCheckInterval = null;
-const CURRENT_VERSION = "0.35"; // Version actuelle
+const CURRENT_VERSION = "0.36"; // Version actuelle
 
 async function checkForUpdates() {
   // Détecter si c'est un écran tactile ou un PC normal

@@ -7,17 +7,59 @@
   "profiles": [
     {
       "id": "DEFAULT",
-      "label": "DEFAULT",
+      "label": "BUREAU",
       "grid": { "cols": 4 },
       "buttons": [
-        { "label": "TaskMgr", "hint": "Ctrl+Shift+Esc", "accent": "cyan", "action": { "type": "keys", "payload": "CTRL+SHIFT+ESC" } },
-        { "label": "Explorer", "hint": "Win+E", "accent": "blue", "action": { "type": "keys", "payload": "WIN+E" } },
-        { "label": "Terminal", "hint": "Win+T", "accent": "purple", "action": { "type": "keys", "payload": "WIN+T" } },
-        { "label": "Lock", "hint": "Win+L", "accent": "red", "action": { "type": "keys", "payload": "WIN+L" } },
-        { "label": "Calculator", "hint": "Win+R calc", "accent": "green", "action": { "type": "keys", "payload": "WIN+R" } },
-        { "label": "Notepad", "hint": "Win+R notepad", "accent": "orange", "action": { "type": "keys", "payload": "WIN+R" } },
-        { "label": "Control", "hint": "Win+R control", "accent": "white", "action": { "type": "keys", "payload": "WIN+R" } },
-        { "label": "AUTO-RELOAD", "hint": "Test v0.22 OK", "accent": "cyan", "action": { "type": "keys", "payload": "WIN+R" } }
+        { 
+          "label": "Précédent", "hint": "Onglet <", "accent": "purple", 
+          "icon": "fa-angles-left",
+          "action": { "type": "keys", "payload": "CTRL+SHIFT+TAB" } 
+        },
+        { 
+          "label": "Rechercher", "hint": "Ctrl+F", "accent": "blue", 
+          "icon": "fa-magnifying-glass",
+          "action": { "type": "keys", "payload": "CTRL+F" } 
+        },
+        { 
+          "label": "Suivant", "hint": "Onglet >", "accent": "purple", 
+          "icon": "fa-angles-right",
+          "action": { "type": "keys", "payload": "CTRL+TAB" } 
+        },
+        { 
+          "label": "Capture", "hint": "Impr Écran", "accent": "white", 
+          "icon": "fa-camera",
+          "action": { "type": "keys", "payload": "WIN+SHIFT+S" } 
+        },
+        { 
+          "label": "Copier", "hint": "Ctrl+C", "accent": "cyan", 
+          "icon": "fa-copy",
+          "action": { "type": "keys", "payload": "CTRL+C" } 
+        },
+        { 
+          "label": "Historique", "hint": "Win+V", "accent": "orange", 
+          "icon": "fa-clipboard-list",
+          "action": { "type": "keys", "payload": "WIN+V" } 
+        },
+        { 
+          "label": "Coller", "hint": "Ctrl+V", "accent": "cyan", 
+          "icon": "fa-paste",
+          "action": { "type": "keys", "payload": "CTRL+V" } 
+        },
+        { 
+          "label": "Sauver", "hint": "Ctrl+S", "accent": "green", 
+          "icon": "fa-floppy-disk",
+          "action": { "type": "keys", "payload": "CTRL+S" } 
+        },
+        { 
+          "label": "Annuler", "hint": "Undo", "accent": "red", 
+          "icon": "fa-rotate-left",
+          "action": { "type": "keys", "payload": "CTRL+Z" } 
+        },
+        { 
+          "label": "Rétablir", "hint": "Redo", "accent": "green", 
+          "icon": "fa-rotate-right",
+          "action": { "type": "keys", "payload": "CTRL+Y" } 
+        }
       ]
     },
     {
