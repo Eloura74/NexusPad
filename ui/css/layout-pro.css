@@ -21,12 +21,14 @@ html, body {
   display: none !important;
 }
 
-/* 2) App root avec background animé */
+/* 2) App root FORCE FIT Pad7 */
 #app {
-  height: 100dvh;
-  max-height: 100vh;
+  height: 600px; /* FORCE hauteur Pad7 exacte */
+  max-height: 600px;
+  width: 100%;
+  max-width: 100%;
   display: grid;
-  grid-template-rows: 36px minmax(0, 1fr); /* Header ultra-compact pour Pad7 */
+  grid-template-rows: 16px 584px; /* Header 16px + contenu 584px = 600px total */
   overflow: hidden;
   background: 
     radial-gradient(circle at 30% 70%, rgba(255, 165, 0, 0.15) 0%, transparent 50%),
@@ -53,13 +55,15 @@ html, body {
   }
 }
 
-/* 3) Zone contenu : sidebar + main */
+/* 3) Zone contenu FORCE 572px */
 .app-content {
-  min-height: 0; /* CRUCIAL pour éviter overflow */
-  max-height: 100%;
+  height: 584px; /* FORCE hauteur exacte */
+  max-height: 584px;
+  min-height: 584px;
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr); /* sidebar ultra-fine pour Pad7 */
+  grid-template-columns: 32px 1fr; /* sidebar HYPER-fin */
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 /* 4) Sidebar ultra-compacte */
@@ -74,35 +78,47 @@ html, body {
   border-right: none; /* Supprime bordure */
 }
 
-/* 5) Main zone quasi-invisible */
+/* 5) Main zone FORCE hauteur */
 .main {
-  min-height: 0;
-  padding: 2px; /* Padding minimal */
+  height: 584px; /* FORCE même hauteur que parent */
+  min-height: 584px;
+  max-height: 584px;
+  padding: 0;
+  margin: 0;
   position: relative;
-  background: rgba(5, 7, 11, 0.01); /* Quasi-transparent */
+  background: transparent;
   backdrop-filter: none;
-}
-
-/* 6) Grid : layout 4×3 pour Pad7 optimal */
-.keys-grid {
-  height: 100%;
-  min-height: 0;
-  max-height: 100%;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr)); /* Retour à 4x3 pour mieux rentrer */
-  grid-template-rows: repeat(3, minmax(0, 1fr));
-  gap: 4px; /* Gap minimal */
-  place-content: stretch; /* Utilise tout l'espace */
-  padding: 2px;
   overflow: hidden;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center; /* Centre la grille verticalement */
+  justify-content: center;
 }
 
-/* 7) Cellule de grid */
+/* 6) Grid : FORCE FIT 4×3 dans 540px */
+.keys-grid {
+  height: 450px; /* FORCE hauteur exacte */
+  min-height: 450px;
+  max-height: 450px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: 150px 150px 150px; /* Rangées ULTRA-compactes */
+  gap: 0px; /* ZERO gap pour max espace */
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* 7) Cellule de grid - ZERO padding vertical */
 .key-cell {
   display: grid;
   place-items: center;
   min-width: 0;
   min-height: 0;
+  padding: 0px 8px; /* ZERO padding vertical, minimal horizontal */
+  box-sizing: border-box;
 }
 
 /* 8) Bouton responsive dans sa cellule */
@@ -226,7 +242,7 @@ html, body {
 @media (max-width: 1200px) {
   .keys-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    grid-template-rows: repeat(3, minmax(0, 1fr));
+    grid-template-rows: 150px 150px 150px; /* GARDE mes tailles fixes */
   }
 }
 
@@ -254,12 +270,13 @@ html, body {
   }
   
   .keys-grid {
-    gap: 4px; /* Gap minimal */
-    padding: 4px;
+    gap: 0px; /* ZERO gap pour max espace */
+    padding: 0px; /* ZERO padding */
+    grid-template-rows: 150px 150px 150px; /* Force mes tailles */
   }
   
   .main {
-    padding: 4px;
+    padding: 0px; /* ZERO padding pour max espace */
   }
   
   .sidebar {
@@ -276,20 +293,20 @@ html, body {
   display: grid;
   grid-template-columns: 1fr auto auto;
   align-items: center;
-  padding: 0 8px;
-  background: rgba(5, 7, 11, 0.02); /* Quasi-invisible */
+  padding: 0 3px;
+  background: rgba(5, 7, 11, 0.02);
   backdrop-filter: blur(1px);
-  border-bottom: none; /* Supprime bordure pour plus d'espace */
-  min-height: 36px;
-  height: 36px;
-  max-height: 36px;
+  border-bottom: none;
+  min-height: 16px; /* FORCE 16px MINI */
+  height: 16px;
+  max-height: 16px;
 }
 
 .header-minimal .logo {
-  font-size: 11px; /* Plus petit */
+  font-size: 9px; /* ULTRA-compact */
   font-weight: 700;
   color: #ffffff;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
 }
 
 .header-minimal .controls {
@@ -299,8 +316,8 @@ html, body {
 }
 
 .header-minimal .controls button {
-  padding: 4px 6px !important; /* Boutons plus compacts */
-  font-size: 10px;
+  padding: 2px 4px !important; /* ULTRA-compact */
+  font-size: 8px; /* Plus petit */
 }
 
 .header-minimal .status {

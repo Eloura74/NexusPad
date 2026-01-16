@@ -1228,7 +1228,7 @@ function stopAutoSync() {
 
 /* ========= AUTO-UPDATE DETECTION ========= */
 let updateCheckInterval = null;
-const CURRENT_VERSION = "0.42"; // Version actuelle
+const CURRENT_VERSION = "0.54"; // Version actuelle
 
 async function checkForUpdates() {
   // Détecter si c'est un écran tactile ou un PC normal
@@ -1237,14 +1237,15 @@ async function checkForUpdates() {
                        window.location.hostname.includes('109'); // IP du pad7
   
   if (isTouchDevice) {
-    // Écran tactile : Auto-update très espacé pour éviter les interruptions
-    setTimeout(checkVersionNow, 10000); // 10 secondes au démarrage
-    updateCheckInterval = setInterval(checkVersionNow, 300000); // 5 minutes
-    console.log("🔄 Auto-update TACTILE activé (5min interval)");
+    // Écran tactile : Auto-update RAPIDE pour tests
+    setTimeout(checkVersionNow, 3000); // 3 secondes au démarrage
+    updateCheckInterval = setInterval(checkVersionNow, 15000); // 15 secondes
+    console.log("🔄 Auto-update TACTILE activé (15s interval)");
   } else {
-    // PC normal : Check très peu fréquent
-    updateCheckInterval = setInterval(checkVersionNow, 600000); // 10 minutes
-    console.log("🔄 Auto-update PC activé (10min interval)");
+    // PC normal : Check plus fréquent pour tests
+    setTimeout(checkVersionNow, 5000); // 5 secondes au démarrage
+    updateCheckInterval = setInterval(checkVersionNow, 30000); // 30 secondes
+    console.log("🔄 Auto-update PC activé (30s interval)");
   }
 }
 
@@ -1394,13 +1395,23 @@ function enableTouchDrag() {
     connectWs();
     
     // Setup edit mode après que le DOM soit prêt
-    setupEditMode();
+    setupModeButtons(); // Corriger le nom de fonction
     
     // Activer le support tactile pour le drag & drop
     enableTouchDrag();
     
     // Auto-reload pour écrans tactiles (détection de nouvelle version) - RÉDUIT
     checkForUpdates();
+    
+    // DEBUG: Synchronisation manuelle avec Ctrl+U
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'u') {
+        e.preventDefault();
+        console.log("🔄 Synchronisation manuelle forcée...");
+        checkVersionNow();
+      }
+    });
+    
     toast("Interface initialisée", 1500);
 
   } catch (e) {

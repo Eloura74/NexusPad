@@ -2,7 +2,7 @@
 
 # Script pour incrémenter automatiquement la version + sync multi-device
 # Usage: ./bump-version.sh
-
+#  montre ou est le dossier ou se trouve le script
 VERSION_FILE="ui/js/app.js"
 HTML_FILE="ui/index.html"
 HTML_PRO_FILE="ui/index-pro.html"

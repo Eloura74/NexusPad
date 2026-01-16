@@ -28,13 +28,13 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
-/* Glass Panel - Ultra Transparent pour voir le background */
+/* Glass Panel - ULTRA Transparent pour voir le background */
 .glass {
-  background: rgba(5, 7, 11, 0.25); /* Très transparent pour voir l'image */
-  backdrop-filter: blur(8px); /* Moins de flou pour plus de clarté */
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.15); /* Bordure plus visible */
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  background: transparent; /* Complètement transparent */
+  backdrop-filter: blur(2px); /* Très léger flou */
+  -webkit-backdrop-filter: blur(2px);
+  border: 1px solid rgba(255,255,255,0.03); /* Bordure quasi-invisible */
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1); /* Ombre très subtile */
   border-radius: 16px;
 }
 
