@@ -444,20 +444,26 @@ function renderButtons(profile) {
       }, 100);
     });
 
+    // Optimized Dragover with Throttling
+    let dragOverThrottle = false;
     wrap.addEventListener("dragover", (e) => {
       if (!isDragging || !isReorganizeMode) return;
       e.preventDefault();
       e.dataTransfer.dropEffect = "move";
-      wrap.classList.add("drag-over");
-      // Effet hover pendant le drag
-      input.style.boxShadow = "0 0 20px rgba(0, 204, 255, 0.6)";
+      
+      if (!dragOverThrottle) {
+        dragOverThrottle = true;
+        requestAnimationFrame(() => {
+          wrap.classList.add("drag-over");
+          dragOverThrottle = false;
+        });
+      }
     });
 
     wrap.addEventListener("dragleave", (e) => {
       // Check if we're actually leaving the element (not just moving to a child)
       if (!wrap.contains(e.relatedTarget)) {
         wrap.classList.remove("drag-over");
-        input.style.boxShadow = "";
       }
     });
 
@@ -1228,7 +1234,7 @@ function stopAutoSync() {
 
 /* ========= AUTO-UPDATE DETECTION ========= */
 let updateCheckInterval = null;
-const CURRENT_VERSION = "0.59"; // Version actuelle
+const CURRENT_VERSION = "0.60"; // Version actuelle
 
 async function checkForUpdates() {
   // Détecter si c'est un écran tactile ou un PC normal
