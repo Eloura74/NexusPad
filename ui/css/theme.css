@@ -218,17 +218,9 @@ header.glass {
   margin-top: 4px;
 }
 
-/* LED Indicator */
+/* LED Indicator - REMOVED */
 .led {
-  position: absolute;
-  z-index: 10;
-  top: 100%;
-  border-radius: 50%;
-  width: 6px;
-  height: 6px;
-  margin-top: 16px;
-  transition: background-color 0.2s ease;
-  background-color: #4c1d95; /* Darker purple when off */
+  display: none;
 }
 
 /* Removed Noise Texture completely */
@@ -238,9 +230,11 @@ header.glass {
 /* Active Text/Icon */
 .key-wrap.active .key-icon {
   color: #00ccff;
+  text-shadow: 0 0 10px #00ccff; /* Restore text shadow for active state only */
 }
 .key-wrap.active .key-label {
   color: #00ccff;
+  text-shadow: 0 0 10px #00ccff;
 }
 
 /* Active Button */
@@ -250,36 +244,38 @@ header.glass {
   box-shadow:
     inset 0 1px 1px rgba(255, 255, 255, 0.4),
     inset 0 -4px 0 #00ccff,
-    0 0 10px rgba(0, 204, 255, 0.3);
+    0 0 20px rgba(0, 204, 255, 0.6); /* Outer glow */
+  transform: translateY(2px); /* Physical press feel */
+}
+
+.key-wrap.active .key::after {
+  background: #00ccff;
 }
 
 /* Active LED */
-.key-wrap.active .led {
-  background-color: #00ccff;
-  box-shadow: 0 0 8px #00ccff;
-  /* Removed complex pulse animation */
-}
+/* Removed complex pulse animation */
 
-/* Active BG Glow - Simplified */
+/* Active BG Glow - Backlight Effect */
 .bg-glow {
   position: absolute;
-  inset: 0;
+  inset: -10px; /* Extend slightly beyond key */
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.2s linear;
+  transition: opacity 0.1s ease-out; /* Fast on */
+  z-index: 1; /* Behind key (key is z-index 2) */
 }
 .bg-glow::before {
   content: "";
   position: absolute;
-  inset: 5px;
-  border-radius: 10px;
-  background: #00ccff;
-  /* Reduced blur radius */
-  filter: blur(8px); 
+  inset: 0;
+  border-radius: 12px;
+  background: var(--glow-color, #00ccff); /* Use accent color */
+  filter: blur(15px); 
 }
 
 .key-wrap.active .bg-glow {
-  opacity: 0.6;
+  opacity: 0.8;
+  transition: opacity 0.05s ease-in; /* Instant on */
 }
 
 /* Hover & Press Effects */

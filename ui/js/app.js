@@ -375,31 +375,62 @@ function renderButtons(profile) {
     let clickTimeout = null;
     let hasStartedDrag = false;
     
-    // Handle Click Events - Gestion Stricte des Modes
+    // Handle Click & Touch Events - Instant Feedback
+    
+    const activate = () => {
+      if (isReorganizeMode || isEditMode) return;
+      wrap.classList.add("active");
+      // Backlight effect
+      const bgGlow = wrap.querySelector('.bg-glow');
+      if (bgGlow) bgGlow.style.opacity = '1';
+    };
+
+    const deactivate = () => {
+      wrap.classList.remove("active");
+      const bgGlow = wrap.querySelector('.bg-glow');
+      if (bgGlow) bgGlow.style.opacity = '';
+    };
+
+    // Pointer Events for low latency
+    wrap.addEventListener("pointerdown", (e) => {
+      if (hasStartedDrag || isReorganizeMode) return;
+      wrap.setPointerCapture(e.pointerId);
+      activate();
+    });
+
+    wrap.addEventListener("pointerup", (e) => {
+      wrap.releasePointerCapture(e.pointerId);
+      deactivate();
+    });
+
+    wrap.addEventListener("pointercancel", (e) => {
+      wrap.releasePointerCapture(e.pointerId);
+      deactivate();
+    });
+    
+    wrap.addEventListener("pointerleave", deactivate);
+
+    // Click for Action Execution
     input.addEventListener("click", (e) => {
       e.preventDefault();
       
       if (hasStartedDrag) return;
       
       if (isEditMode) {
-        // Mode ÉDITION : Ouvre l'éditeur uniquement
         openEditor(profile.id, index);
         return;
       }
       
       if (isReorganizeMode) {
-        // Mode RÉORGANISATION : Aucune action, juste hint
         toast("🤏 Glissez pour réorganiser cette touche", 1500);
         return;
       }
       
-      // Mode NORMAL : Exécute l'action + feedback visuel
-      input.checked = true;
+      // Visual feedback fallback (if pointer events failed)
+      activate();
+      setTimeout(deactivate, 150);
+
       executeAction(b);
-      
-      setTimeout(() => {
-        input.checked = false;
-      }, 280);
     });
     
     // Plus besoin des event listeners mousedown/touchstart/mouseup/touchend
@@ -1234,7 +1265,7 @@ function stopAutoSync() {
 
 /* ========= AUTO-UPDATE DETECTION ========= */
 let updateCheckInterval = null;
-const CURRENT_VERSION = "0.60"; // Version actuelle
+const CURRENT_VERSION = "0.62"; // Version actuelle
 
 async function checkForUpdates() {
   // Détecter si c'est un écran tactile ou un PC normal
