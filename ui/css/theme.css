@@ -11,13 +11,11 @@
 }
 
 body {
-  background-color: #050505;
-  /* Premium Neon Mesh Gradient with futuristic background - Plus transparent */
-  background-image: 
-    linear-gradient(rgba(5, 7, 11, 0.3), rgba(5, 7, 11, 0.3)), /* Encore plus transparent pour voir l'image */
-    repeating-linear-gradient(0deg, transparent, transparent 49px, rgba(34, 211, 238, 0.02) 50px),
-    repeating-linear-gradient(90deg, transparent, transparent 49px, rgba(168, 85, 247, 0.02) 50px),
-    radial-gradient(circle at 50% 0%, rgba(34, 211, 238, 0.06), transparent 50%),
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.08), transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.08), transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(120, 200, 255, 0.08), transparent 50%),
+    radial-gradient(circle at 0% 50%, rgba(120, 255, 180, 0.06), transparent 40%),
     radial-gradient(circle at 100% 100%, rgba(168, 85, 247, 0.06), transparent 40%),
     url('../images/8194.jpg?v=20');
   background-attachment: fixed;
@@ -26,6 +24,21 @@ body {
   background-repeat: no-repeat, repeat, repeat, no-repeat, no-repeat, no-repeat;
   color: #e2e8f0;
   font-family: 'Inter', sans-serif;
+  
+  /* TACTILE : Optimisations écrans tactiles */
+  -webkit-touch-callout: none; /* Désactive le menu contextuel iOS */
+  -webkit-user-select: none;   /* Désactive la sélection de texte */
+  user-select: none;           /* Standard property pour la compatibilité */
+  -webkit-tap-highlight-color: transparent; /* Supprime le highlight orange */
+  touch-action: manipulation;  /* Optimise les gestes tactiles */
+  
+  /* PERFORMANCE : Optimisations GPU ULTRA */
+  -webkit-transform: translate3d(0,0,0); /* Force GPU composite layer */
+  transform: translate3d(0,0,0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000px; /* Optimise les 3D transforms */
+  perspective: 1000px;
 }
 
 /* Glass Panel - ULTRA Transparent pour voir le background */
@@ -42,6 +55,26 @@ body {
   background: rgba(255,255,255,0.02);
   border: 1px solid rgba(255,255,255,0.05);
   border-radius: 12px;
+}
+
+/* TACTILE : Curseur et interactions */
+@media (pointer: coarse) {
+  /* Écrans tactiles uniquement */
+  * {
+    cursor: none !important; /* Cache le curseur sur écrans tactiles */
+  }
+  
+  body {
+    cursor: none !important;
+  }
+}
+
+/* Auto-détection des appareils tactiles */
+@media (hover: none) and (pointer: coarse) {
+  /* Tablettes et smartphones */
+  html, body, * {
+    cursor: none !important;
+  }
 }
 
 /* Amélioration lisibilité texte sur background image */

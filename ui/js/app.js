@@ -1228,7 +1228,7 @@ function stopAutoSync() {
 
 /* ========= AUTO-UPDATE DETECTION ========= */
 let updateCheckInterval = null;
-const CURRENT_VERSION = "0.54"; // Version actuelle
+const CURRENT_VERSION = "0.59"; // Version actuelle
 
 async function checkForUpdates() {
   // Détecter si c'est un écran tactile ou un PC normal
@@ -1374,6 +1374,39 @@ function enableTouchDrag() {
     }, { passive: false });
 }
 
+/* ========= ANIMATIONS TACTILES OPTIMISÉES ========= */
+function enableTouchAnimations() {
+  let currentTouch = null;
+  
+  // TOUCHSTART : Animation simple et fluide
+  document.addEventListener('touchstart', (e) => {
+    const wrap = e.target.closest('.wrap');
+    if (!wrap) return;
+    
+    currentTouch = wrap;
+    
+    // Animation CSS SIMPLE et performante
+    wrap.classList.add('touch-pressed');
+    
+  }, { passive: true });
+  
+  // TOUCHEND : Retour immédiat
+  document.addEventListener('touchend', (e) => {
+    if (currentTouch) {
+      currentTouch.classList.remove('touch-pressed');
+      currentTouch = null;
+    }
+  }, { passive: true });
+  
+  // TOUCHCANCEL : Nettoyage rapide
+  document.addEventListener('touchcancel', (e) => {
+    if (currentTouch) {
+      currentTouch.classList.remove('touch-pressed');
+      currentTouch = null;
+    }
+  }, { passive: true });
+}
+
 /* ========= INIT ========= */
 // Removed elSelect listener
 
@@ -1399,6 +1432,9 @@ function enableTouchDrag() {
     
     // Activer le support tactile pour le drag & drop
     enableTouchDrag();
+    
+    // Activer les animations tactiles
+    enableTouchAnimations();
     
     // Auto-reload pour écrans tactiles (détection de nouvelle version) - RÉDUIT
     checkForUpdates();
