@@ -36,7 +36,7 @@
           "action": { "type": "keys", "payload": "CTRL+C" } 
         },
         { 
-          "label": "Historique", "hint": "Win+V", "accent": "orange", 
+          "label": "Historique", "hint": "Win+V", "accent": "blue", 
           "icon": "fa-clipboard-list",
           "action": { "type": "keys", "payload": "WIN+V" } 
         },
@@ -69,7 +69,7 @@
       "buttons": [
         { "label": "OBS", "hint": "Launch", "accent": "green", "action": { "type": "run", "payload": "obs64.exe" } },
         { "label": "Rec", "hint": "Start/Stop", "accent": "red", "action": { "type": "keys", "payload": "F10" } },
-        { "label": "Mic", "hint": "Mute", "accent": "orange", "action": { "type": "keys", "payload": "F11" } },
+        { "label": "Mic", "hint": "Mute", "accent": "purple", "action": { "type": "keys", "payload": "F11" } },
         { "label": "Scene 1", "hint": "Main", "accent": "cyan", "action": { "type": "keys", "payload": "F1" } },
         { "label": "Scene 2", "hint": "Gaming", "accent": "purple", "action": { "type": "keys", "payload": "F2" } },
         { "label": "Scene 3", "hint": "Chat", "accent": "blue", "action": { "type": "keys", "payload": "F3" } },
@@ -87,7 +87,7 @@
         { "label": "Screenshot", "hint": "Win+PrtSc", "accent": "white", "action": { "type": "keys", "payload": "WIN+PRTSC" } },
         { "label": "Twitch", "hint": "Launch", "accent": "cyan", "action": { "type": "run", "payload": "chrome.exe --app=https://twitch.tv" } },
         { "label": "YouTube", "hint": "Launch", "accent": "red", "action": { "type": "run", "payload": "chrome.exe --app=https://youtube.com" } },
-        { "label": "Game Mode", "hint": "Win+G", "accent": "orange", "action": { "type": "keys", "payload": "WIN+G" } }
+        { "label": "Game Mode", "hint": "Win+G", "accent": "purple", "action": { "type": "keys", "payload": "WIN+G" } }
       ]
     }
   ]

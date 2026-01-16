@@ -321,7 +321,9 @@ function renderButtons(profile) {
     // 2. Button avec la structure exacte du CSS
     const btn = document.createElement("div");
     btn.className = "button";
-    btn.dataset.accent = b.accent || "cyan";
+    
+    // Move accent to wrap for shared scope
+    wrap.dataset.accent = b.accent || "cyan";
 
     // 3. Corner Effects
     const corner = document.createElement("div");
@@ -1265,7 +1267,7 @@ function stopAutoSync() {
 
 /* ========= AUTO-UPDATE DETECTION ========= */
 let updateCheckInterval = null;
-const CURRENT_VERSION = "0.62"; // Version actuelle
+const CURRENT_VERSION = "0.63"; // Version actuelle
 
 async function checkForUpdates() {
   // Détecter si c'est un écran tactile ou un PC normal

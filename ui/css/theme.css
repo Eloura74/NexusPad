@@ -345,17 +345,58 @@ body.edit-mode .key-wrap.dragging {
   cursor: grabbing;
 }
 
-/* Accents - Simplified Glows */
-.key[data-accent="cyan"]   { --glow-color: #06b6d4; }
-.key[data-accent="purple"] { --glow-color: #a855f7; }
-.key[data-accent="red"]    { --glow-color: #ef4444; }
-.key[data-accent="green"]  { --glow-color: #22c55e; }
-.key[data-accent="orange"] { --glow-color: #f97316; }
-.key[data-accent="white"]  { --glow-color: #e2e8f0; }
+/* Accents - Harmonized Glows */
+/* Now targeting key-wrap since we moved the data attribute */
+.key-wrap[data-accent="cyan"]   { --glow-color: #06b6d4; }
+.key-wrap[data-accent="purple"] { --glow-color: #a855f7; }
+.key-wrap[data-accent="red"]    { --glow-color: #ef4444; }
+.key-wrap[data-accent="green"]  { --glow-color: #22c55e; }
+.key-wrap[data-accent="orange"] { --glow-color: #f97316; }
+.key-wrap[data-accent="white"]  { --glow-color: #e2e8f0; }
+.key-wrap[data-accent="blue"]   { --glow-color: #3b82f6; } /* Added Blue */
 
-.key[data-accent] .key-icon {
+.key-wrap[data-accent] .key-icon {
   color: var(--glow-color);
-  /* Removed text-shadow for performance */
+}
+
+/* Profile Buttons - Better Visibility */
+.profile-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(30, 41, 59, 0.8); /* Lighter background for inactive */
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #cbd5e1; /* Brighter text */
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease, background 0.1s ease, color 0.1s ease;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.profile-btn:hover {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  transform: translateX(2px);
+  border-color: rgba(255,255,255,0.3);
+}
+
+.profile-btn.active {
+  background: rgba(34, 211, 238, 0.2);
+  border-color: rgba(34, 211, 238, 0.6);
+  color: #22d3ee;
+  box-shadow: 0 0 15px rgba(34, 211, 238, 0.2);
+  transform: scale(1.05);
+}
+
+/* Grid Centering */
+#grid {
+  justify-content: center; /* Center grid items horizontally */
+  align-content: start;
 }
 
 /* Ghost Button */
