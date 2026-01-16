@@ -48,6 +48,14 @@ body {
   border-radius: 16px;
 }
 
+/* Transparent Glass for Sidebar and Grid (User Request) */
+aside .glass,
+section.glass {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
 .glass-inner {
   background: rgba(255,255,255,0.02);
   border: 1px solid rgba(255,255,255,0.05);
