@@ -30,14 +30,11 @@ html, body {
   display: grid;
   grid-template-rows: 16px 584px; /* Header 16px + contenu 584px = 600px total */
   overflow: hidden;
-  background: 
-    radial-gradient(circle at 30% 70%, rgba(255, 165, 0, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 70% 30%, rgba(0, 204, 255, 0.08) 0%, transparent 60%),
-    url('../images/bg-main.jpg');
-  background-size: cover, cover, cover;
-  background-position: center, center, center;
+  background: url('../images/bg-professional.png');
+  background-size: cover;
+  background-position: center;
   background-attachment: fixed;
-  animation: bgShift 30s ease-in-out infinite alternate;
+  /* Animation removed for stability/professional look */
 }
 
 @keyframes bgShift {
@@ -231,6 +228,11 @@ html, body {
 
 .mode-reorg .keys-grid .wrap {
   cursor: grab;
+  pointer-events: auto !important; /* Enable drag events */
+}
+
+.mode-reorg .keys-grid .wrap input {
+  pointer-events: none !important; /* Let drag events pass through to wrap */
 }
 
 .mode-reorg .keys-grid .wrap:active {

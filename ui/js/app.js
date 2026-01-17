@@ -164,11 +164,31 @@ async function loadConfig() {
 
 function saveConfig() {
   if (!cfg) return;
+  
+  // 1. Save to LocalStorage (Backup/Fast)
   localStorage.setItem("nexuspad_config", JSON.stringify(cfg));
   dbg("Saved config to localStorage");
   
+  // 2. Save to Server (Persistence)
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    try {
+      ws.send(JSON.stringify({
+        type: "save_config",
+        config: cfg
+      }));
+      dbg("Sent config to server");
+      toast("📤 Sauvegarde envoyée...", 1000);
+    } catch (e) {
+      console.error("Send error:", e);
+      toast("❌ Erreur envoi: " + e.message, 3000);
+    }
+  } else {
+    console.warn("WebSocket not connected, cannot save to server");
+    toast("⚠️ Hors ligne : Sauvegarde locale uniquement", 3000);
+  }
+  
   // Déclencher sync manuelle après sauvegarde
-  setTimeout(syncConfigOnDemand, 100);
+  // setTimeout(syncConfigOnDemand, 100); // Removed as we rely on server now
 }
 
 /* ========= PROFILES / GRID ========= */
@@ -481,7 +501,7 @@ function renderButtons(profile) {
     let dragOverThrottle = false;
     wrap.addEventListener("dragover", (e) => {
       if (!isDragging || !isReorganizeMode) return;
-      e.preventDefault();
+      e.preventDefault(); // CRITICAL for drop
       e.dataTransfer.dropEffect = "move";
       
       if (!dragOverThrottle) {
@@ -947,6 +967,29 @@ function connectWs() {
       toast(`ERR: ${msg.message ?? "?"}`, 1600);
       return;
     }
+
+    if (msg?.type === "config_updated") {
+      dbg("Config updated from server");
+      if (msg.config) {
+        cfg = msg.config;
+        // Refresh current profile if it exists
+        if (currentProfile) {
+          const updatedProfile = cfg.profiles.find(p => p.id === currentProfile.id);
+          if (updatedProfile) {
+            currentProfile = updatedProfile;
+            renderButtons(currentProfile);
+          } else {
+             // Profile deleted? fallback to first
+             currentProfile = cfg.profiles[0];
+             renderButtons(currentProfile);
+          }
+        } else {
+           renderProfileButtons();
+        }
+        toast("Configuration synchronisée", 1500);
+      }
+      return;
+    }
   });
 
   ws.addEventListener("close", () => {
@@ -1008,8 +1051,7 @@ function setupModeButtons() {
       } else {
         setMode('edit');
         // Re-render pour appliquer draggable
-        const profile = getCurrentProfile();
-        renderButtons(profile);
+        renderButtons(currentProfile);
       }
     });
   }
@@ -1021,8 +1063,7 @@ function setupModeButtons() {
       } else {
         setMode('reorg');
         // Re-render pour appliquer draggable
-        const profile = getCurrentProfile();
-        renderButtons(profile);
+        renderButtons(currentProfile);
       }
     });
   }
@@ -1267,7 +1308,7 @@ function stopAutoSync() {
 
 /* ========= AUTO-UPDATE DETECTION ========= */
 let updateCheckInterval = null;
-const CURRENT_VERSION = "0.63"; // Version actuelle
+const CURRENT_VERSION = "0.75"; // Version actuelle
 
 async function checkForUpdates() {
   // Détecter si c'est un écran tactile ou un PC normal
@@ -1310,6 +1351,8 @@ async function checkVersionNow() {
           
           if (serverVersion !== CURRENT_VERSION) {
             console.log(`🔄 Nouvelle version détectée: ${CURRENT_VERSION} → ${serverVersion}`);
+            // Vider le cache localStorage pour forcer le rechargement de la config
+            localStorage.removeItem("nexuspad_config");
             toast("🔄 Mise à jour détectée - Rechargement...", 3000);
             
             // Attendre 2 secondes pour que l'utilisateur voie le message
@@ -1333,7 +1376,7 @@ function enableTouchDrag() {
     
     document.addEventListener("touchstart", function(e) {
         if (!isReorganizeMode) return;
-        const target = e.target.closest('.key-wrap');
+        const target = e.target.closest('.wrap');
         if (target && target.draggable) {
             // Empêcher le comportement par défaut (scroll)
             e.preventDefault();
@@ -1367,10 +1410,10 @@ function enableTouchDrag() {
             
             const touch = e.touches[0];
             const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-            const targetWrap = elementBelow ? elementBelow.closest('.key-wrap') : null;
+            const targetWrap = elementBelow ? elementBelow.closest('.wrap') : null;
             
             // Nettoyer les anciens highlights
-            document.querySelectorAll(".key-wrap").forEach(w => {
+            document.querySelectorAll(".wrap").forEach(w => {
                 w.classList.remove("drag-over");
             });
             
@@ -1386,7 +1429,7 @@ function enableTouchDrag() {
         
         const touch = e.changedTouches[0];
         const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-        const targetWrap = elementBelow ? elementBelow.closest('.key-wrap') : null;
+        const targetWrap = elementBelow ? elementBelow.closest('.wrap') : null;
         
         if (targetWrap && targetWrap !== touchDragData.element && targetWrap.dataset.index !== undefined) {
             const toIndex = parseInt(targetWrap.dataset.index);
@@ -1404,7 +1447,7 @@ function enableTouchDrag() {
         }
         
         // Nettoyer les états visuels
-        document.querySelectorAll(".key-wrap").forEach(w => {
+        document.querySelectorAll(".wrap").forEach(w => {
             w.classList.remove("dragging", "drop-target", "drag-over");
             w.style.opacity = "";
         });
@@ -1477,6 +1520,10 @@ function enableTouchAnimations() {
     
     // Auto-reload pour écrans tactiles (détection de nouvelle version) - RÉDUIT
     checkForUpdates();
+
+    // Démarrer la synchro auto (polling) car le serveur ne peut pas être redémarré
+    // DÉSACTIVÉ car le WebSocket broadcast fonctionne maintenant
+    // startAutoSync();
     
     // DEBUG: Synchronisation manuelle avec Ctrl+U
     document.addEventListener('keydown', (e) => {

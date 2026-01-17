@@ -2,6 +2,7 @@
 import asyncio
 import json
 import time
+import os
 from typing import Dict, Set, Any, Optional
 
 import websockets
@@ -10,6 +11,17 @@ from websockets.legacy.server import WebSocketServerProtocol
 PORT = 8765
 PC_TTL_SECONDS = 7.0
 BROADCAST_EVERY_SECONDS = 1.0
+
+# Path resolution logic
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Try standard dev structure first: ../ui/profiles.json
+PROFILES_PATH = os.path.join(BASE_DIR, "../ui/profiles.json")
+
+# If not found (e.g. Docker without mount), try local profiles.json
+if not os.path.exists(os.path.dirname(PROFILES_PATH)):
+    PROFILES_PATH = os.path.join(BASE_DIR, "profiles.json")
+
+print(f"📂 Profiles path: {PROFILES_PATH}", flush=True)
 
 ui_clients: Set[WebSocketServerProtocol] = set()
 pc_clients: Set[WebSocketServerProtocol] = set()
@@ -152,6 +164,28 @@ async def handle_client(ws: WebSocketServerProtocol) -> None:
                     continue
 
                 await safe_send(ws, {"type": "error", "message": "hello invalide"})
+                continue
+
+            # UI -> SAVE CONFIG
+            if client_type == "ui" and msg.get("type") == "save_config":
+                new_config = msg.get("config")
+                if isinstance(new_config, dict):
+                    try:
+                        with open(PROFILES_PATH, "w", encoding="utf-8") as f:
+                            json.dump(new_config, f, indent=2, ensure_ascii=False)
+                        log("[UI] Config saved to disk")
+                        await safe_send(ws, {"type": "ack", "message": "Configuration sauvegardée sur le serveur"})
+                        
+                        # Broadcast new config to all UI clients to keep them in sync
+                        await broadcast_ui({
+                            "type": "config_updated",
+                            "config": new_config,
+                            "ts": now()
+                        })
+                        log(f"[UI] Broadcasted new config to {len(ui_clients)} clients")
+                    except Exception as e:
+                        log(f"[UI] Error saving config: {e}")
+                        await safe_send(ws, {"type": "error", "message": "Erreur sauvegarde serveur"})
                 continue
 
             # UI -> CMD
