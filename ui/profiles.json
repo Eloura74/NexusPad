@@ -1,93 +1,593 @@
 {
-  "defaults": {
-    "agentBaseUrl": "http://192.168.1.50:8787",
-    "token": "CHANGE_ME_TOKEN",
-    "pollHealthMs": 3000
-  },
   "profiles": [
     {
-      "id": "DEFAULT",
-      "label": "BUREAU",
-      "grid": { "cols": 4 },
+      "id": "dev",
+      "label": "💻 Dev",
+      "grid": {
+        "cols": 4,
+        "rows": 3
+      },
       "buttons": [
-        { 
-          "label": "Précédent", "hint": "Onglet <", "accent": "purple", 
-          "icon": "fa-angles-left",
-          "action": { "type": "keys", "payload": "CTRL+SHIFT+TAB" } 
+        {
+          "label": "VS Code",
+          "accent": "blue",
+          "icon": "fa-code",
+          "action": {
+            "type": "run",
+            "payload": "code"
+          }
         },
-        { 
-          "label": "Rechercher", "hint": "Ctrl+F", "accent": "blue", 
-          "icon": "fa-magnifying-glass",
-          "action": { "type": "keys", "payload": "CTRL+F" } 
+        {
+          "label": "Terminal",
+          "accent": "purple",
+          "icon": "fa-terminal",
+          "action": {
+            "type": "hotkey",
+            "payload": "WIN+X"
+          }
         },
-        { 
-          "label": "Suivant", "hint": "Onglet >", "accent": "purple", 
-          "icon": "fa-angles-right",
-          "action": { "type": "keys", "payload": "CTRL+TAB" } 
+        {
+          "label": "Docker",
+          "accent": "cyan",
+          "icon": "fa-docker",
+          "action": {
+            "type": "run",
+            "payload": "C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe"
+          }
         },
-        { 
-          "label": "Capture", "hint": "Impr Écran", "accent": "white", 
-          "icon": "fa-camera",
-          "action": { "type": "keys", "payload": "WIN+SHIFT+S" } 
+        {
+          "label": "Git Bash",
+          "accent": "orange",
+          "icon": "fa-git-alt",
+          "action": {
+            "type": "run",
+            "payload": "C:\\Program Files\\Git\\git-bash.exe"
+          }
         },
-        { 
-          "label": "Copier", "hint": "Ctrl+C", "accent": "cyan", 
+        {
+          "label": "Copier",
+          "accent": "green",
           "icon": "fa-copy",
-          "action": { "type": "keys", "payload": "CTRL+C" } 
+          "action": {
+            "type": "hotkey",
+            "payload": "CTRL+C"
+          }
         },
-        { 
-          "label": "Historique", "hint": "Win+V", "accent": "blue", 
-          "icon": "fa-clipboard-list",
-          "action": { "type": "keys", "payload": "WIN+V" } 
-        },
-        { 
-          "label": "Coller", "hint": "Ctrl+V", "accent": "cyan", 
+        {
+          "label": "Coller",
+          "accent": "green",
           "icon": "fa-paste",
-          "action": { "type": "keys", "payload": "CTRL+V" } 
+          "action": {
+            "type": "hotkey",
+            "payload": "CTRL+V"
+          }
         },
-        { 
-          "label": "Sauver", "hint": "Ctrl+S", "accent": "green", 
-          "icon": "fa-floppy-disk",
-          "action": { "type": "keys", "payload": "CTRL+S" } 
-        },
-        { 
-          "label": "Annuler", "hint": "Undo", "accent": "red", 
+        {
+          "label": "Undo",
+          "accent": "red",
           "icon": "fa-rotate-left",
-          "action": { "type": "keys", "payload": "CTRL+Z" } 
+          "action": {
+            "type": "hotkey",
+            "payload": "CTRL+Z"
+          }
         },
-        { 
-          "label": "Rétablir", "hint": "Redo", "accent": "green", 
+        {
+          "label": "Redo",
+          "accent": "red",
           "icon": "fa-rotate-right",
-          "action": { "type": "keys", "payload": "CTRL+Y" } 
+          "action": {
+            "type": "hotkey",
+            "payload": "CTRL+Y"
+          }
+        },
+        {
+          "label": "Chercher",
+          "accent": "cyan",
+          "icon": "fa-magnifying-glass",
+          "action": {
+            "type": "hotkey",
+            "payload": "CTRL+F"
+          }
+        },
+        {
+          "label": "Tout Sél.",
+          "accent": "blue",
+          "icon": "fa-check-double",
+          "action": {
+            "type": "hotkey",
+            "payload": "CTRL+A"
+          }
+        },
+        {
+          "label": "Sauver",
+          "accent": "green",
+          "icon": "fa-floppy-disk",
+          "action": {
+            "type": "hotkey",
+            "payload": "CTRL+S"
+          }
+        },
+        {
+          "label": "Print",
+          "accent": "white",
+          "icon": "fa-print",
+          "action": {
+            "type": "hotkey",
+            "payload": "CTRL+P"
+          }
         }
       ]
     },
     {
-      "id": "STUDIO",
-      "label": "STUDIO",
-      "grid": { "cols": 4 },
+      "id": "nav",
+      "label": "🌐 Nav",
+      "grid": {
+        "cols": 4,
+        "rows": 3
+      },
       "buttons": [
-        { "label": "OBS", "hint": "Launch", "accent": "green", "action": { "type": "run", "payload": "obs64.exe" } },
-        { "label": "Rec", "hint": "Start/Stop", "accent": "red", "action": { "type": "keys", "payload": "F10" } },
-        { "label": "Mic", "hint": "Mute", "accent": "purple", "action": { "type": "keys", "payload": "F11" } },
-        { "label": "Scene 1", "hint": "Main", "accent": "cyan", "action": { "type": "keys", "payload": "F1" } },
-        { "label": "Scene 2", "hint": "Gaming", "accent": "purple", "action": { "type": "keys", "payload": "F2" } },
-        { "label": "Scene 3", "hint": "Chat", "accent": "blue", "action": { "type": "keys", "payload": "F3" } },
-        { "label": "Transition", "hint": "Cut", "accent": "white", "action": { "type": "keys", "payload": "F12" } }
+        {
+          "label": "Chrome",
+          "accent": "blue",
+          "icon": "fa-chrome",
+          "action": {
+            "type": "run",
+            "payload": "chrome.exe"
+          }
+        },
+        {
+          "label": "Firefox",
+          "accent": "orange",
+          "icon": "fa-firefox",
+          "action": {
+            "type": "run",
+            "payload": "firefox.exe"
+          }
+        },
+        {
+          "label": "Edge",
+          "accent": "cyan",
+          "icon": "fa-edge",
+          "action": {
+            "type": "run",
+            "payload": "msedge.exe"
+          }
+        },
+        {
+          "label": "Explorateur",
+          "accent": "blue",
+          "icon": "fa-folder-open",
+          "action": {
+            "type": "run",
+            "payload": "explorer.exe"
+          }
+        },
+        {
+          "label": "Downloads",
+          "accent": "green",
+          "icon": "fa-download",
+          "action": {
+            "type": "shell",
+            "payload": "explorer %USERPROFILE%\\Downloads"
+          }
+        },
+        {
+          "label": "Documents",
+          "accent": "purple",
+          "icon": "fa-file-lines",
+          "action": {
+            "type": "shell",
+            "payload": "explorer %USERPROFILE%\\Documents"
+          }
+        },
+        {
+          "label": "Bureau",
+          "accent": "cyan",
+          "icon": "fa-desktop",
+          "action": {
+            "type": "shell",
+            "payload": "explorer %USERPROFILE%\\Desktop"
+          }
+        },
+        {
+          "label": "Images",
+          "accent": "orange",
+          "icon": "fa-image",
+          "action": {
+            "type": "shell",
+            "payload": "explorer %USERPROFILE%\\Pictures"
+          }
+        },
+        {
+          "label": "Nouv. Ong.",
+          "accent": "blue",
+          "icon": "fa-plus",
+          "action": {
+            "type": "hotkey",
+            "payload": "CTRL+T"
+          }
+        },
+        {
+          "label": "Ferm. Ong.",
+          "accent": "red",
+          "icon": "fa-xmark",
+          "action": {
+            "type": "hotkey",
+            "payload": "CTRL+W"
+          }
+        },
+        {
+          "label": "Actualiser",
+          "accent": "green",
+          "icon": "fa-rotate",
+          "action": {
+            "type": "hotkey",
+            "payload": "F5"
+          }
+        },
+        {
+          "label": "Recherche",
+          "accent": "white",
+          "icon": "fa-magnifying-glass",
+          "action": {
+            "type": "hotkey",
+            "payload": "CTRL+E"
+          }
+        }
       ]
     },
     {
-      "id": "GAMING",
-      "label": "GAMING",
-      "grid": { "cols": 4 },
+      "id": "office",
+      "label": "📝 Office",
+      "grid": {
+        "cols": 4,
+        "rows": 3
+      },
       "buttons": [
-        { "label": "Steam", "hint": "Launch", "accent": "blue", "action": { "type": "run", "payload": "steam.exe" } },
-        { "label": "Discord", "hint": "Launch", "accent": "purple", "action": { "type": "run", "payload": "discord.exe" } },
-        { "label": "ShadowPlay", "hint": "Save 5m", "accent": "green", "action": { "type": "keys", "payload": "ALT+F10" } },
-        { "label": "Screenshot", "hint": "Win+PrtSc", "accent": "white", "action": { "type": "keys", "payload": "WIN+PRTSC" } },
-        { "label": "Twitch", "hint": "Launch", "accent": "cyan", "action": { "type": "run", "payload": "chrome.exe --app=https://twitch.tv" } },
-        { "label": "YouTube", "hint": "Launch", "accent": "red", "action": { "type": "run", "payload": "chrome.exe --app=https://youtube.com" } },
-        { "label": "Game Mode", "hint": "Win+G", "accent": "purple", "action": { "type": "keys", "payload": "WIN+G" } }
+        {
+          "label": "Word",
+          "accent": "blue",
+          "icon": "fa-file-word",
+          "action": {
+            "type": "run",
+            "payload": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE"
+          }
+        },
+        {
+          "label": "Excel",
+          "accent": "green",
+          "icon": "fa-file-excel",
+          "action": {
+            "type": "run",
+            "payload": "C:\\Program Files\\Microsoft Office\\root\\Office16\\EXCEL.EXE"
+          }
+        },
+        {
+          "label": "PowerPoint",
+          "accent": "orange",
+          "icon": "fa-file-powerpoint",
+          "action": {
+            "type": "run",
+            "payload": "C:\\Program Files\\Microsoft Office\\root\\Office16\\POWERPNT.EXE"
+          }
+        },
+        {
+          "label": "Outlook",
+          "accent": "cyan",
+          "icon": "fa-envelope",
+          "action": {
+            "type": "run",
+            "payload": "C:\\Program Files\\Microsoft Office\\root\\Office16\\OUTLOOK.EXE"
+          }
+        },
+        {
+          "label": "Notepad",
+          "accent": "white",
+          "icon": "fa-note-sticky",
+          "action": {
+            "type": "run",
+            "payload": "notepad.exe"
+          }
+        },
+        {
+          "label": "Notepad++",
+          "accent": "green",
+          "icon": "fa-file-code",
+          "action": {
+            "type": "run",
+            "payload": "C:\\Program Files\\Notepad++\\notepad++.exe"
+          }
+        },
+        {
+          "label": "PDF",
+          "accent": "red",
+          "icon": "fa-file-pdf",
+          "action": {
+            "type": "shell",
+            "payload": "start AcroRd32.exe"
+          }
+        },
+        {
+          "label": "Calc",
+          "accent": "blue",
+          "icon": "fa-calculator",
+          "action": {
+            "type": "run",
+            "payload": "calc.exe"
+          }
+        },
+        {
+          "label": "Gras",
+          "accent": "white",
+          "icon": "fa-bold",
+          "action": {
+            "type": "hotkey",
+            "payload": "CTRL+B"
+          }
+        },
+        {
+          "label": "Italique",
+          "accent": "white",
+          "icon": "fa-italic",
+          "action": {
+            "type": "hotkey",
+            "payload": "CTRL+I"
+          }
+        },
+        {
+          "label": "Souligné",
+          "accent": "white",
+          "icon": "fa-underline",
+          "action": {
+            "type": "hotkey",
+            "payload": "CTRL+U"
+          }
+        },
+        {
+          "label": "Snip",
+          "accent": "purple",
+          "icon": "fa-scissors",
+          "action": {
+            "type": "hotkey",
+            "payload": "WIN+SHIFT+S"
+          }
+        }
+      ]
+    },
+    {
+      "id": "media",
+      "label": "🎵 Média",
+      "grid": {
+        "cols": 4,
+        "rows": 3
+      },
+      "buttons": [
+        {
+          "label": "Spotify",
+          "accent": "green",
+          "icon": "fa-spotify",
+          "action": {
+            "type": "run",
+            "payload": "C:\\Users\\%USERNAME%\\AppData\\Roaming\\Spotify\\Spotify.exe"
+          }
+        },
+        {
+          "label": "VLC",
+          "accent": "orange",
+          "icon": "fa-film",
+          "action": {
+            "type": "run",
+            "payload": "C:\\Program Files\\VideoLAN\\VLC\\vlc.exe"
+          }
+        },
+        {
+          "label": "Discord",
+          "accent": "purple",
+          "icon": "fa-discord",
+          "action": {
+            "type": "run",
+            "payload": "C:\\Users\\%USERNAME%\\AppData\\Local\\Discord\\Update.exe --processStart Discord.exe"
+          }
+        },
+        {
+          "label": "OBS",
+          "accent": "red",
+          "icon": "fa-video",
+          "action": {
+            "type": "run",
+            "payload": "C:\\Program Files\\obs-studio\\bin\\64bit\\obs64.exe"
+          }
+        },
+        {
+          "label": "Play/Pause",
+          "accent": "cyan",
+          "icon": "fa-play",
+          "action": {
+            "type": "hotkey",
+            "payload": "MEDIA_PLAY_PAUSE"
+          }
+        },
+        {
+          "label": "Suivant",
+          "accent": "blue",
+          "icon": "fa-forward-step",
+          "action": {
+            "type": "hotkey",
+            "payload": "MEDIA_NEXT_TRACK"
+          }
+        },
+        {
+          "label": "Précédent",
+          "accent": "blue",
+          "icon": "fa-backward-step",
+          "action": {
+            "type": "hotkey",
+            "payload": "MEDIA_PREV_TRACK"
+          }
+        },
+        {
+          "label": "Mute",
+          "accent": "red",
+          "icon": "fa-volume-xmark",
+          "action": {
+            "type": "hotkey",
+            "payload": "VOLUME_MUTE"
+          }
+        },
+        {
+          "label": "Vol +",
+          "accent": "green",
+          "icon": "fa-volume-high",
+          "action": {
+            "type": "hotkey",
+            "payload": "VOLUME_UP"
+          }
+        },
+        {
+          "label": "Vol -",
+          "accent": "orange",
+          "icon": "fa-volume-low",
+          "action": {
+            "type": "hotkey",
+            "payload": "VOLUME_DOWN"
+          }
+        },
+        {
+          "label": "Screen Rec",
+          "accent": "red",
+          "icon": "fa-circle-dot",
+          "action": {
+            "type": "hotkey",
+            "payload": "WIN+ALT+R"
+          }
+        },
+        {
+          "label": "Screenshot",
+          "accent": "purple",
+          "icon": "fa-camera",
+          "action": {
+            "type": "hotkey",
+            "payload": "WIN+SHIFT+S"
+          }
+        }
+      ]
+    },
+    {
+      "id": "system",
+      "label": "⚙️ Système",
+      "grid": {
+        "cols": 4,
+        "rows": 3
+      },
+      "buttons": [
+        {
+          "label": "Task Mgr",
+          "accent": "red",
+          "icon": "fa-list-check",
+          "action": {
+            "type": "hotkey",
+            "payload": "CTRL+SHIFT+ESC"
+          }
+        },
+        {
+          "label": "Paramètres",
+          "accent": "blue",
+          "icon": "fa-gear",
+          "action": {
+            "type": "hotkey",
+            "payload": "WIN+I"
+          }
+        },
+        {
+          "label": "Verrou",
+          "accent": "orange",
+          "icon": "fa-lock",
+          "action": {
+            "type": "hotkey",
+            "payload": "WIN+L"
+          }
+        },
+        {
+          "label": "Recherche",
+          "accent": "cyan",
+          "icon": "fa-magnifying-glass",
+          "action": {
+            "type": "hotkey",
+            "payload": "WIN+S"
+          }
+        },
+        {
+          "label": "Bureau",
+          "accent": "purple",
+          "icon": "fa-desktop",
+          "action": {
+            "type": "hotkey",
+            "payload": "WIN+D"
+          }
+        },
+        {
+          "label": "Alt+Tab",
+          "accent": "blue",
+          "icon": "fa-window-restore",
+          "action": {
+            "type": "hotkey",
+            "payload": "ALT+TAB"
+          }
+        },
+        {
+          "label": "Snapshot",
+          "accent": "green",
+          "icon": "fa-camera-retro",
+          "action": {
+            "type": "hotkey",
+            "payload": "PRINTSCREEN"
+          }
+        },
+        {
+          "label": "Panneau",
+          "accent": "white",
+          "icon": "fa-sliders",
+          "action": {
+            "type": "run",
+            "payload": "control.exe"
+          }
+        },
+        {
+          "label": "CMD",
+          "accent": "white",
+          "icon": "fa-terminal",
+          "action": {
+            "type": "run",
+            "payload": "cmd.exe"
+          }
+        },
+        {
+          "label": "PowerShell",
+          "accent": "blue",
+          "icon": "fa-code",
+          "action": {
+            "type": "run",
+            "payload": "powershell.exe"
+          }
+        },
+        {
+          "label": "Quitter",
+          "accent": "red",
+          "icon": "fa-power-off",
+          "action": {
+            "type": "hotkey",
+            "payload": "ALT+F4"
+          }
+        },
+        {
+          "label": "Moniteurs",
+          "accent": "cyan",
+          "icon": "fa-display",
+          "action": {
+            "type": "hotkey",
+            "payload": "WIN+P"
+          }
+        }
       ]
     }
   ]
