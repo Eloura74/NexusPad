@@ -9,6 +9,7 @@
       },
       "buttons": [
         {
+          "id": "dev_vscode",
           "label": "VS Code",
           "accent": "blue",
           "icon": "fa-code",
@@ -18,6 +19,7 @@
           }
         },
         {
+          "id": "dev_terminal",
           "label": "Terminal",
           "accent": "purple",
           "icon": "fa-terminal",
@@ -27,6 +29,7 @@
           }
         },
         {
+          "id": "dev_docker",
           "label": "Docker",
           "accent": "cyan",
           "icon": "fa-docker",
@@ -36,6 +39,7 @@
           }
         },
         {
+          "id": "dev_gitbash",
           "label": "Git Bash",
           "accent": "orange",
           "icon": "fa-git-alt",
@@ -45,6 +49,7 @@
           }
         },
         {
+          "id": "dev_copy",
           "label": "Copier",
           "accent": "green",
           "icon": "fa-copy",
@@ -54,6 +59,7 @@
           }
         },
         {
+          "id": "dev_paste",
           "label": "Coller",
           "accent": "green",
           "icon": "fa-paste",
@@ -63,6 +69,7 @@
           }
         },
         {
+          "id": "dev_undo",
           "label": "Undo",
           "accent": "red",
           "icon": "fa-rotate-left",
@@ -72,6 +79,7 @@
           }
         },
         {
+          "id": "dev_redo",
           "label": "Redo",
           "accent": "red",
           "icon": "fa-rotate-right",
@@ -81,6 +89,7 @@
           }
         },
         {
+          "id": "dev_find",
           "label": "Chercher",
           "accent": "cyan",
           "icon": "fa-magnifying-glass",
@@ -90,6 +99,7 @@
           }
         },
         {
+          "id": "dev_select_all",
           "label": "Tout Sél.",
           "accent": "blue",
           "icon": "fa-check-double",
@@ -99,6 +109,7 @@
           }
         },
         {
+          "id": "dev_save",
           "label": "Sauver",
           "accent": "green",
           "icon": "fa-floppy-disk",
@@ -108,6 +119,7 @@
           }
         },
         {
+          "id": "dev_print",
           "label": "Print",
           "accent": "white",
           "icon": "fa-print",

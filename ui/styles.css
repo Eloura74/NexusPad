@@ -100,3 +100,46 @@ body{
   color: var(--text);
 }
 .hidden{display:none}
+
+/* Visual Feedback States */
+.button.loading .bg-glow {
+  opacity: 0.8 !important;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.4) 0%, transparent 70%);
+  animation: pulse-loading 1s infinite;
+}
+
+.button.success .bg-glow {
+  opacity: 1 !important;
+  background: radial-gradient(circle at center, rgba(34, 197, 94, 0.6) 0%, transparent 70%); /* Green */
+  transition: opacity 0.2s;
+}
+
+.button.error .bg-glow {
+  opacity: 1 !important;
+  background: radial-gradient(circle at center, rgba(239, 68, 68, 0.6) 0%, transparent 70%); /* Red */
+  transition: opacity 0.2s;
+}
+
+.button.success {
+  border-color: rgba(34, 197, 94, 0.8) !important;
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
+}
+
+.button.error {
+  border-color: rgba(239, 68, 68, 0.8) !important;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+  animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes pulse-loading {
+  0% { transform: scale(0.95); opacity: 0.5; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+  100% { transform: scale(0.95); opacity: 0.5; }
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}

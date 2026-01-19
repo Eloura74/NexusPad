@@ -3,14 +3,37 @@ import asyncio
 import json
 import time
 import os
+import logging
+from logging.handlers import RotatingFileHandler
 from typing import Dict, Set, Any, Optional
 
 import websockets
 from websockets.legacy.server import WebSocketServerProtocol
 
-PORT = 8765
-PC_TTL_SECONDS = 7.0
-BROADCAST_EVERY_SECONDS = 1.0
+# Configuration
+PORT = int(os.getenv('WS_PORT', '8765'))
+PC_TTL_SECONDS = float(os.getenv('PC_TTL', '7.0'))
+BROADCAST_EVERY_SECONDS = float(os.getenv('BROADCAST_INTERVAL', '1.0'))
+
+# Logging setup
+LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logs')
+os.makedirs(LOG_DIR, exist_ok=True)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    handlers=[
+        RotatingFileHandler(
+            os.path.join(LOG_DIR, 'server.log'),
+            maxBytes=10*1024*1024,  # 10MB
+            backupCount=5
+        ),
+        logging.StreamHandler()
+    ]
+)
+
+logger = logging.getLogger(__name__)
 
 # Path resolution logic
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -21,7 +44,7 @@ PROFILES_PATH = os.path.join(BASE_DIR, "../ui/profiles.json")
 if not os.path.exists(os.path.dirname(PROFILES_PATH)):
     PROFILES_PATH = os.path.join(BASE_DIR, "profiles.json")
 
-print(f"📂 Profiles path: {PROFILES_PATH}", flush=True)
+logger.info(f"📂 Profiles path: {PROFILES_PATH}")
 
 ui_clients: Set[WebSocketServerProtocol] = set()
 pc_clients: Set[WebSocketServerProtocol] = set()
@@ -35,10 +58,6 @@ def now() -> float:
     return time.time()
 
 
-def log(*a):
-    print(*a, flush=True)
-
-
 def current_hosts() -> list[str]:
     cutoff = now() - PC_TTL_SECONDS
     return sorted([h for h, t in pc_last_seen.items() if t >= cutoff])
@@ -50,18 +69,28 @@ def current_status() -> Dict[str, Any]:
 
 
 async def safe_send_raw(ws: WebSocketServerProtocol, msg: str) -> bool:
+    """Send a message to a WebSocket client with proper error handling."""
     try:
         await ws.send(msg)
         return True
-    except Exception:
+    except websockets.ConnectionClosed as e:
+        logger.warning(f"Connection closed during send: code={e.code}, reason={e.reason}")
+        return False
+    except asyncio.TimeoutError:
+        logger.error("Timeout while sending message")
+        return False
+    except Exception as e:
+        logger.error(f"Unexpected error in safe_send: {type(e).__name__}: {e}")
         return False
 
 
 async def safe_send(ws: WebSocketServerProtocol, payload: Dict[str, Any]) -> bool:
+    """Send a JSON payload to a WebSocket client."""
     return await safe_send_raw(ws, json.dumps(payload))
 
 
 async def broadcast_ui(payload: Dict[str, Any]) -> None:
+    """Broadcast a message to all connected UI clients."""
     if not ui_clients:
         return
     msg = json.dumps(payload)
@@ -71,19 +100,27 @@ async def broadcast_ui(payload: Dict[str, Any]) -> None:
             dead.append(ws)
     for ws in dead:
         ui_clients.discard(ws)
+        logger.debug(f"Removed dead UI client during broadcast")
 
 
 async def send_to_pc(host: str, payload: Dict[str, Any]) -> bool:
+    """Send a message to a specific PC client by hostname."""
     ws = pc_host_to_ws.get(host)
     if not ws:
+        logger.warning(f"No WebSocket found for host: {host}")
         return False
     return await safe_send_raw(ws, json.dumps(payload))
 
 
 async def broadcaster_loop() -> None:
+    """Periodically broadcast status to all UI clients (only if changed)."""
+    prev_status = None
     while True:
         st = current_status()
-        await broadcast_ui(st)
+        # Only broadcast if status has changed
+        if st != prev_status:
+            await broadcast_ui(st)
+            prev_status = st
         await asyncio.sleep(BROADCAST_EVERY_SECONDS)
 
 
@@ -147,7 +184,7 @@ async def handle_client(ws: WebSocketServerProtocol) -> None:
 
                 if client_type == "ui":
                     ui_clients.add(ws)
-                    log(f"[UI] hello from {peer} (ui_clients={len(ui_clients)})")
+                    logger.info(f"[UI] hello from {peer} (ui_clients={len(ui_clients)})")
                     await safe_send(ws, current_status())
                     continue
 
@@ -159,7 +196,7 @@ async def handle_client(ws: WebSocketServerProtocol) -> None:
                         pc_ws_to_host[ws] = host
                         pc_host_to_ws[host] = ws
                         pc_last_seen[host] = now()
-                        log(f"[PC] hello host={host} from {peer} (pc_clients={len(pc_clients)})")
+                        logger.info(f"[PC] hello host={host} from {peer} (pc_clients={len(pc_clients)})")
                         await broadcast_ui(current_status())
                     continue
 
@@ -173,7 +210,7 @@ async def handle_client(ws: WebSocketServerProtocol) -> None:
                     try:
                         with open(PROFILES_PATH, "w", encoding="utf-8") as f:
                             json.dump(new_config, f, indent=2, ensure_ascii=False)
-                        log("[UI] Config saved to disk")
+                        logger.info("[UI] Config saved to disk")
                         await safe_send(ws, {"type": "ack", "message": "Configuration sauvegardée sur le serveur"})
                         
                         # Broadcast new config to all UI clients to keep them in sync
@@ -182,9 +219,9 @@ async def handle_client(ws: WebSocketServerProtocol) -> None:
                             "config": new_config,
                             "ts": now()
                         })
-                        log(f"[UI] Broadcasted new config to {len(ui_clients)} clients")
+                        logger.info(f"[UI] Broadcasted new config to {len(ui_clients)} clients")
                     except Exception as e:
-                        log(f"[UI] Error saving config: {e}")
+                        logger.error(f"[UI] Error saving config: {e}")
                         await safe_send(ws, {"type": "error", "message": "Erreur sauvegarde serveur"})
                 continue
 
@@ -193,7 +230,7 @@ async def handle_client(ws: WebSocketServerProtocol) -> None:
                 cmd_id = msg.get("id")
                 normalized = normalize_cmd(msg)
                 if not normalized:
-                    log("[UI] cmd invalide:", msg)
+                    logger.warning(f"[UI] cmd invalide: {msg}")
                     await safe_send(ws, {"type": "error", "message": "cmd invalide", "id": cmd_id})
                     continue
 
@@ -202,16 +239,16 @@ async def handle_client(ws: WebSocketServerProtocol) -> None:
                     target = pick_default_target()
 
                 if not target:
-                    log("[UI] cmd mais aucun PC online")
+                    logger.warning("[UI] cmd mais aucun PC online")
                     await safe_send(ws, {"type": "error", "message": "Aucun PC connecté", "id": cmd_id})
                     continue
 
                 if target not in current_hosts():
-                    log(f"[UI] cmd target={target} hors ligne")
+                    logger.warning(f"[UI] cmd target={target} hors ligne")
                     await safe_send(ws, {"type": "error", "message": f"PC '{target}' hors ligne", "id": cmd_id})
                     continue
 
-                log(f"[UI] cmd -> target={target} payload={normalized}")
+                logger.info(f"[UI] cmd -> target={target} payload={normalized}")
                 ok = await send_to_pc(target, normalized)
                 if not ok:
                     await safe_send(ws, {"type": "error", "message": f"PC '{target}' non joignable", "id": cmd_id})
@@ -230,12 +267,12 @@ async def handle_client(ws: WebSocketServerProtocol) -> None:
                     pc_ws_to_host[ws] = host
                     pc_host_to_ws[host] = ws
                     pc_last_seen[host] = now()
-                    log(f"[PC] heartbeat host={host}")
+                    logger.debug(f"[PC] heartbeat host={host}")
                     await broadcast_ui(current_status())
                     continue
 
-                if msg.get("type") in ("ack", "error"):
-                    log(f"[PC] feedback: {msg}")
+                if msg.get("type") in ("ack", "error", "cmd_result"):
+                    logger.info(f"[PC] feedback: {msg}")
                     await broadcast_ui(msg)
                     continue
 
@@ -246,18 +283,18 @@ async def handle_client(ws: WebSocketServerProtocol) -> None:
     finally:
         if client_type == "ui":
             ui_clients.discard(ws)
-            log(f"[UI] disconnected (ui_clients={len(ui_clients)})")
+            logger.info(f"[UI] disconnected (ui_clients={len(ui_clients)})")
 
         if client_type == "pc":
             pc_clients.discard(ws)
             host = pc_ws_to_host.pop(ws, None) or bound_host
             if host and pc_host_to_ws.get(host) == ws:
                 pc_host_to_ws.pop(host, None)
-            log(f"[PC] disconnected host={host} (pc_clients={len(pc_clients)})")
+            logger.info(f"[PC] disconnected host={host} (pc_clients={len(pc_clients)})")
 
 
 async def main() -> None:
-    log(f"WebSocket MacroPad prêt (port {PORT})")
+    logger.info(f"🚀 WebSocket MacroPad prêt (port {PORT})")
     asyncio.create_task(broadcaster_loop())
 
     async with websockets.serve(

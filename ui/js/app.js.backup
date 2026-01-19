@@ -111,7 +111,6 @@ let wsReconnectDelay = WS_RECONNECT_MIN_MS;
 
 let lastStatusTs = 0;
 let onlineHosts = [];
-const pendingCommands = new Map(); // id -> element
 
 /* ========= UI HELPERS ========= */
 function toast(msg, ms = 1200) {
@@ -453,10 +452,7 @@ function renderButtons(profile) {
       activate();
       setTimeout(deactivate, 150);
 
-      activate();
-      setTimeout(deactivate, 150);
-
-      executeAction(b, btn); // Pass button element for feedback
+      executeAction(b);
     });
     
     // Plus besoin des event listeners mousedown/touchstart/mouseup/touchend
@@ -574,7 +570,7 @@ function renderButtons(profile) {
   }
 }
 
-function executeAction(b, element) {
+function executeAction(b) {
   const pc = getSelectedPc();
   const action = b.action ?? { type: "noop", payload: "" };
   const mapped = makeCmdFromAction(action);
@@ -582,22 +578,7 @@ function executeAction(b, element) {
   const id = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
   
   // Visual feedback
-  // toast(`Envoi -> ${pc}: ${mapped.cmd}`, 900); // Toast is redundant with button feedback now
-  
-  if (element) {
-    element.classList.add('loading');
-    pendingCommands.set(id, element);
-    
-    // Safety timeout (2s)
-    setTimeout(() => {
-      if (pendingCommands.has(id)) {
-        element.classList.remove('loading');
-        element.classList.add('error'); // Show timeout as error
-        setTimeout(() => element.classList.remove('error'), 500);
-        pendingCommands.delete(id);
-      }
-    }, 2000);
-  }
+  toast(`Envoi -> ${pc}: ${mapped.cmd}`, 900);
   
   sendCmd({ ...mapped, target: pc, id });
 }
@@ -977,18 +958,6 @@ function connectWs() {
       return;
     }
 
-    if (msg?.type === "cmd_result") {
-      const btnEl = pendingCommands.get(msg.id);
-      if (btnEl) {
-        btnEl.classList.remove('loading');
-        const state = msg.status === 'ok' ? 'success' : 'error';
-        btnEl.classList.add(state);
-        setTimeout(() => btnEl.classList.remove(state), 1000); // Clear after 1s
-        pendingCommands.delete(msg.id);
-      }
-      return;
-    }
-
     if (msg?.type === "ack") {
       toast(msg.message ?? "ACK", 1000);
       return;
@@ -1339,7 +1308,7 @@ function stopAutoSync() {
 
 /* ========= AUTO-UPDATE DETECTION ========= */
 let updateCheckInterval = null;
-const CURRENT_VERSION = "0.77"; // Version actuelle
+const CURRENT_VERSION = "0.76"; // Version actuelle
 
 async function checkForUpdates() {
   // Détecter si c'est un écran tactile ou un PC normal

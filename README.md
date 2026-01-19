@@ -1,11 +1,26 @@
 # 🎮 NexusPad v1.0
 
-> **Interface tactile professionnelle pour macropad avec drag & drop et synchronisation automatique**
+> **Transformez votre smartphone ou tablette en Stream Deck professionnel gratuit**
 
 [![Version](https://img.shields.io/badge/Version-1.0-brightgreen.svg)](https://github.com/coder/nexuspad)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Web-orange.svg)]()
 [![Touch](https://img.shields.io/badge/Touch-Optimized-purple.svg)]()
+
+---
+
+## 🤔 C'est quoi NexusPad ?
+
+**NexusPad** est une solution logicielle open-source qui remplace un **Elgato Stream Deck** physique. 
+
+Au lieu d'acheter un boîtier coûteux (150€+), NexusPad vous permet d'utiliser **n'importe quel écran tactile** (vieux smartphone Android, iPad, tablette, ou même un second écran tactile) comme surface de contrôle pour votre PC.
+
+### Pourquoi utiliser NexusPad ?
+- 💸 **100% Gratuit & Open Source** : Pas de matériel propriétaire à acheter.
+- 📱 **Recyclage Malin** : Donnez une seconde vie à vos vieux appareils.
+- ⚡ **Sans Fil** : Fonctionne via le réseau Wi-Fi local.
+- 🎨 **Design Premium** : Interface moderne style "Glassmorphism" avec animations fluides.
+- 🔄 **Synchronisation Totale** : Modifiez un bouton sur votre PC, il change instantanément sur votre tablette.
 
 ---
 
