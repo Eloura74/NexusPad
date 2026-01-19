@@ -1,3 +1,4 @@
+![Socialify](https://socialify.git.ci/Eloura74/NexusPad/image?description=1&font=Inter&language=1&name=1&owner=1&pattern=Circuit%20Board&theme=Dark)
 # 🎮 NexusPad v1.0
 
 > **Transformez votre smartphone ou tablette en Stream Deck professionnel gratuit**
