@@ -1,3 +1,8 @@
+<div align="center">
+  <img src="./images/Portfolio_Informatique_header.png" alt="Bannière Portfolio Informatique" width="100%">
+</div>
+<br>
+
 ![Socialify](https://socialify.git.ci/Eloura74/NexusPad/image?description=1&font=Inter&language=1&name=1&owner=1&pattern=Circuit%20Board&theme=Dark)
 # 🎮 NexusPad v1.0
 
