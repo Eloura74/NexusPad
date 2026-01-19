@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./images/Portfolio_Informatique_header.png" alt="Bannière Portfolio Informatique" width="100%">
+  <img src="./images/NexusPad_header.png" alt="Bannière Portfolio Informatique" width="100%">
 </div>
 <br>
 
